@@ -16,7 +16,8 @@
         "lib": [
             "ES2021",
             "DOM"
-        ]
+        ],
+        "ignoreDeprecations": "6.0"
     },
     "include": [
         "src/**/*.ts"
