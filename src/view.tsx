@@ -2,6 +2,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { StrictMode } from "react";
 import { Root, createRoot } from "react-dom/client";
 import ViewRoot from "./components/ViewRoot";
+import { useVaultFilesStore } from "./stores/vaultFilesStore";
 
 export const VIEW_TYPE_TASK_COLUMNS_VIEW = "task-columns-view";
 
@@ -28,6 +29,21 @@ export class TaskColumnsView extends ItemView {
         const container = this.containerEl.children[1];
         if (!container) return;
         this.root = createRoot(container);
+
+        // ファイル一覧を取得
+        useVaultFilesStore.getState().refresh(this.app);
+
+        // Vaultイベント監視 → storeを更新
+        this.registerEvent(
+            this.app.vault.on("modify", () => useVaultFilesStore.getState().refresh(this.app))
+        );
+        this.registerEvent(
+            this.app.vault.on("create", () => useVaultFilesStore.getState().refresh(this.app))
+        );
+        this.registerEvent(
+            this.app.vault.on("delete", () => useVaultFilesStore.getState().refresh(this.app))
+        );
+
         this.root.render(
             <StrictMode>
                 <ViewRoot />
