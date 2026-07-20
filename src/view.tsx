@@ -18,7 +18,7 @@ export class TaskColumnsView extends ItemView {
     }
 
     getDisplayText(): string {
-        return "Task Columns View";
+        return "Task columns view";
     }
 
     getIcon(): string {

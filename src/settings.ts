@@ -1,18 +1,19 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
-import MyPlugin from './main';
+import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
+import TaskColumnsPlugin from './main';
+import { FolderSuggest } from './ui/folderSuggest';
 
-export interface MyPluginSettings {
-    mySetting: string;
+export interface TaskColumnsSettings {
+    targetFolder: string;
 }
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
-    mySetting: 'default',
+export const DEFAULT_SETTINGS: TaskColumnsSettings = {
+    targetFolder: '',
 };
 
-export class SampleSettingTab extends PluginSettingTab {
-    plugin: MyPlugin;
+export class TaskColumnsSettingTab extends PluginSettingTab {
+    plugin: TaskColumnsPlugin;
 
-    constructor(app: App, plugin: MyPlugin) {
+    constructor(app: App, plugin: TaskColumnsPlugin) {
         super(app, plugin);
         this.plugin = plugin;
     }
@@ -23,16 +24,21 @@ export class SampleSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName('Settings #1')
-            .setDesc("It's a secret")
-            .addText((text) =>
+            .setName('Target folder')
+            .setDesc('Select a folder in your vault')
+            .addText((text) => {
                 text
-                    .setPlaceholder('Enter your secret')
-                    .setValue(this.plugin.settings.mySetting)
+                    .setPlaceholder('Example: folder1/folder2')
+                    .setValue(this.plugin.settings.targetFolder)
                     .onChange(async (value) => {
-                        this.plugin.settings.mySetting = value;
+                        this.plugin.settings.targetFolder = value;
                         await this.plugin.saveSettings();
-                    }),
-            );
+                    });
+
+                new FolderSuggest(this.app, text.inputEl, (folder) => {
+                    this.plugin.settings.targetFolder = folder.path;
+                    this.plugin.saveSettings().catch(() => new Notice('Failed to save settings.'));
+                });
+            });
     }
 }
