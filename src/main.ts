@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf } from "obsidian";
+import { Events, Plugin, WorkspaceLeaf } from "obsidian";
 import { TaskColumnsView, VIEW_TYPE_TASK_COLUMNS_VIEW } from "./view";
 import {
     DEFAULT_SETTINGS,
@@ -8,12 +8,13 @@ import {
 
 export default class TaskColumnsPlugin extends Plugin {
     settings!: TaskColumnsSettings;
+    settingsEvents = new Events();
 
     async onload() {
         await this.loadSettings();
         this.registerView(
             VIEW_TYPE_TASK_COLUMNS_VIEW,
-            (leaf) => new TaskColumnsView(leaf)
+            (leaf) => new TaskColumnsView(leaf, this)
         );
 
         this.addRibbonIcon("dice", "Open my view", async () => {
@@ -60,5 +61,6 @@ export default class TaskColumnsPlugin extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+        this.settingsEvents.trigger('changed', this.settings);
     }
 }
