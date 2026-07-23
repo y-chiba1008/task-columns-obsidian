@@ -1,8 +1,178 @@
 /*
+ * Task Columns - カスタムビュー用スタイル
+ */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+/* ビュー全体のルート要素 */
+.task-columns-view {
+    height: 100%;
+    overflow: auto;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+  }
+  
+  /* テーブルをスクロールさせるためのラッパー */
+  .task-columns-table-wrapper {
+    overflow: auto;
+    height: 100%;
+  }
+  
+  /* テーブル本体 */
+  .task-columns-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    min-width: max-content;
+    font-size: var(--font-ui-small);
+  }
+  
+  /* ヘッダ行・ヘッダセル共通 */
+  .task-columns-header-row {
+    background-color: var(--background-secondary);
+  }
+  
+  .task-columns-header-cell {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: var(--size-4-2, 8px) var(--size-4-3, 12px);
+    background-color: var(--background-secondary);
+    border-bottom: 1px solid var(--background-modifier-border);
+    border-right: 1px solid var(--background-modifier-border);
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    user-select: none;
+  }
+  
+  .task-columns-header-cell:last-child {
+    border-right: none;
+  }
+  
+  /* 日付列のヘッダ（左端固定） */
+  .task-columns-date-header {
+    left: 0;
+    z-index: 3;
+    min-width: 5.5em;
+  }
+  
+  .task-columns-header-icon {
+    margin-right: 0.35em;
+    opacity: 0.75;
+  }
+  
+  .task-columns-header-label {
+    margin-right: 0.35em;
+  }
+  
+  .task-columns-header-menu-icon {
+    opacity: 0.5;
+    font-size: 0.85em;
+    cursor: pointer;
+  }
+  
+  .task-columns-header-menu-icon:hover {
+    opacity: 0.9;
+  }
+  
+  .task-columns-category-header {
+    min-width: 10em;
+  }
+  
+  /* 「カテゴリを追加」ヘッダセル */
+  .task-columns-add-category-header {
+    min-width: 8em;
+  }
+  
+  .task-columns-add-category-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    width: 100%;
+    padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: var(--radius-s, 4px);
+    font-size: var(--font-ui-small);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .task-columns-add-category-button:hover {
+    background-color: var(--interactive-accent-hover);
+  }
+  
+  .task-columns-add-icon {
+    font-weight: 700;
+  }
+  
+  /* データ行 */
+  .task-columns-row:nth-child(even) .task-columns-cell {
+    background-color: var(--background-primary);
+  }
+  
+  .task-columns-row:nth-child(odd) .task-columns-cell {
+    background-color: var(--background-secondary-alt, var(--background-secondary));
+  }
+  
+  .task-columns-cell {
+    vertical-align: top;
+    padding: var(--size-4-2, 8px) var(--size-4-3, 12px);
+    border-bottom: 1px solid var(--background-modifier-border);
+    border-right: 1px solid var(--background-modifier-border);
+  }
+  
+  .task-columns-cell:last-child {
+    border-right: none;
+  }
+  
+  .task-columns-cell:hover {
+    background-color: var(--background-modifier-hover);
+  }
+  
+  /* 日付セル（左端固定） */
+  .task-columns-date-cell {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 5.5em;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    background-color: inherit;
+  }
+  
+  /* 「カテゴリを追加」列の下の余白セル（クリック不可・装飾のみ） */
+  .task-columns-add-category-spacer {
+    background-color: transparent;
+    border-right: none;
+  }
+  
+  /* 1セル内の各タスク */
+  .task-columns-task {
+    padding: 2px 0;
+  }
+  
+  .task-columns-task + .task-columns-task {
+    margin-top: 2px;
+  }
+  
+  .task-columns-task-text {
+    cursor: pointer;
+  }
+  
+  .task-columns-task-text:hover {
+    text-decoration: underline;
+  }
+  
+  /* 空セルにカーソルを合わせたときの「タスク追加」導線（任意の拡張ポイント） */
+  .task-columns-cell-add-task {
+    display: none;
+    font-size: 0.85em;
+    color: var(--text-faint);
+    cursor: pointer;
+  }
+  
+  .task-columns-cell:hover .task-columns-cell-add-task {
+    display: inline-block;
+  }
