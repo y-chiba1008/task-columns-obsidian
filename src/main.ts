@@ -5,6 +5,7 @@ import {
     TaskColumnsSettings,
     TaskColumnsSettingTab,
 } from './settings';
+import { TaskColumnsMockView, VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW } from "./mockView";
 
 export default class TaskColumnsPlugin extends Plugin {
     settings!: TaskColumnsSettings;
@@ -18,26 +19,35 @@ export default class TaskColumnsPlugin extends Plugin {
         );
 
         this.addRibbonIcon("dice", "Open my view", async () => {
-            await this.activateView();
+            await this.activateView(VIEW_TYPE_TASK_COLUMNS_VIEW);
         });
 
         this.addCommand({
             id: "open-tasks-view",
             name: "Open tasks view",
-            callback: () => this.activateView(),
+            callback: () => this.activateView(VIEW_TYPE_TASK_COLUMNS_VIEW),
         });
 
         this.addSettingTab(new TaskColumnsSettingTab(this.app, this));
+
+        // モック
+        this.registerView(
+            VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW,
+            (leaf) => new TaskColumnsMockView(leaf, this)
+        );
+        this.addRibbonIcon("monitor", "Open mock view", async () => {
+            await this.activateView(VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW);
+        });
     }
 
     onunload() {
     }
 
-    async activateView() {
+    async activateView(viewType: string) {
         const { workspace } = this.app;
 
         let leaf: WorkspaceLeaf | null = null;
-        const leaves = workspace.getLeavesOfType(VIEW_TYPE_TASK_COLUMNS_VIEW);
+        const leaves = workspace.getLeavesOfType(viewType);
 
         if (leaves.length > 0) {
             // 既に開いていればそれを使う
@@ -45,7 +55,7 @@ export default class TaskColumnsPlugin extends Plugin {
         } else {
             // 新しいタブに新規作成
             leaf = workspace.getLeaf(true);
-            await leaf?.setViewState({ type: VIEW_TYPE_TASK_COLUMNS_VIEW, active: true });
+            await leaf?.setViewState({ type: viewType, active: true });
         }
 
         if (leaf) await workspace.revealLeaf(leaf);

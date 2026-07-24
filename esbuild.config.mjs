@@ -44,6 +44,7 @@ const context = await esbuild.context({
     bundle: true,
     loader: {
         ".tsx": "tsx",
+        ".html": "text",
     },
     external: [
         'obsidian',
