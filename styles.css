@@ -1,19 +1,16 @@
 /*
- * Task Columns - カスタムビュー用スタイル（table 不使用 / CSS Grid + subgrid 版）
+ * Task Columns - カスタムビュー用スタイル
  *
- * 方針:
- * - table を使わず、CSS Grid の subgrid を利用して
- *   wrapper > column > header / task-item という階層のまま、
- *   全列で行位置が揃う「表」のような見た目を再現する。
+ * Obsidian プラグイン開発の慣習に従い、以下の方針でスタイリングしています。
  * - 色・フォント・余白などのハードコードを避け、Obsidian が提供する
  *   CSS カスタムプロパティ（--background-primary 等）を使用する。
- * - クラス名はすべて "task-columns-" プレフィックスを付与し、
- *   id セレクタは使用しない。
- *
- * 注意:
- * - subgrid は比較的新しい CSS 機能です。Obsidian は最新の Chromium ベースの
- *   Electron 上で動作するため通常は問題ありませんが、対応バージョンに
- *   懸念がある場合は事前に動作確認してください。
+ *   これにより、ライト/ダークテーマやユーザーのカラースキームに
+ *   自動的に追従する。
+ * - クラス名は他プラグイン・テーマとの衝突を避けるため、
+ *   すべて "task-columns-" プレフィックスを付与する。
+ * - id セレクタは使用せず、class セレクタのみで構成する。
+ * - フォントサイズ・フォントファミリーは Obsidian のテーマ設定を
+ *   尊重し、原則として上書きしない。
  */
 
 /* ビュー全体のルート要素 */
@@ -22,47 +19,51 @@
   overflow: auto;
   background-color: var(--background-primary);
   color: var(--text-normal);
+}
+
+/* テーブルをスクロールさせるためのラッパー */
+.task-columns-table-wrapper {
+  overflow: auto;
+  height: 100%;
+}
+
+/* テーブル本体 */
+.task-columns-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: max-content;
   font-size: var(--font-ui-small);
 }
 
-/* グリッドのコンテナ（wrapper） */
-.task-columns-wrapper {
-  display: grid;
-  /* 列: 日付列 / カテゴリ列(可変数) / カテゴリ追加列 */
-  grid-template-columns:
-    minmax(4.5em, auto) repeat(6, minmax(10em, 1fr)) minmax(8em, auto);
-  /* 行: ヘッダ行 + 日付ぶんの行（このモックでは17日分） */
-  grid-template-rows: auto repeat(17, auto);
-  grid-auto-flow: column;
-  min-width: max-content;
+/* ヘッダ行・ヘッダセル共通 */
+.task-columns-header-row {
+  background-color: var(--background-secondary);
 }
 
-/* 各列（column）共通。親の行定義を subgrid として継承することで
-   列をまたいで行の高さ・位置が揃う */
-.task-columns-column {
-  display: grid;
-  grid-row: 1 / -1;
-  grid-template-rows: subgrid;
-}
-
-/* 列と列の境界線 */
-.task-columns-column:not(:last-child) {
-  border-right: 1px solid var(--background-modifier-border);
-}
-
-/* ヘッダセル（各列の1行目） */
-.task-columns-column-header {
+.task-columns-header-cell {
   position: sticky;
   top: 0;
   z-index: 2;
-  display: flex;
-  align-items: center;
   padding: var(--size-4-2, 8px) var(--size-4-3, 12px);
   background-color: var(--background-secondary);
   border-bottom: 1px solid var(--background-modifier-border);
+  border-right: 1px solid var(--background-modifier-border);
+  text-align: left;
   font-weight: 600;
   white-space: nowrap;
   user-select: none;
+}
+
+.task-columns-header-cell:last-child {
+  border-right: none;
+}
+
+/* 日付列のヘッダ（左端固定） */
+.task-columns-date-header {
+  left: 0;
+  z-index: 3;
+  min-width: 5.5em;
 }
 
 .task-columns-header-icon {
@@ -72,12 +73,9 @@
 
 .task-columns-header-label {
   margin-right: 0.35em;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .task-columns-header-menu-icon {
-  margin-left: auto;
   opacity: 0.5;
   font-size: 0.85em;
   cursor: pointer;
@@ -87,48 +85,13 @@
   opacity: 0.9;
 }
 
-/* 日付列 */
-.task-columns-date-column {
-  position: sticky;
-  left: 0;
-  z-index: 3;
+.task-columns-category-header {
+  min-width: 10em;
 }
 
-.task-columns-date-column .task-columns-column-header {
-  z-index: 4;
-}
-
-.task-columns-date-item {
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-/* 各行のセルに相当する task-item */
-.task-columns-task-item {
-  padding: var(--size-4-2, 8px) var(--size-4-3, 12px);
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-
-.task-columns-task-item:hover {
-  background-color: var(--background-modifier-hover);
-}
-
-/* 行の縞模様（1行おきに背景色を変える）
-   nth-child は列内での通し番号なので、ヘッダを含めた奇数/偶数で判定 */
-.task-columns-task-item:nth-child(odd) {
-  background-color: var(--background-secondary-alt, var(--background-secondary));
-}
-
-.task-columns-task-item:nth-child(even) {
-  background-color: var(--background-primary);
-}
-
-/* 「カテゴリを追加」列 */
+/* 「カテゴリを追加」ヘッダセル */
 .task-columns-add-category-header {
-  background-color: transparent;
-  border-bottom: none;
-  padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
+  min-width: 8em;
 }
 
 .task-columns-add-category-button {
@@ -154,7 +117,49 @@
   font-weight: 700;
 }
 
-/* 1つの task-item 内に複数入りうる個別タスク */
+/* データ行 */
+.task-columns-row:nth-child(even) .task-columns-cell {
+  background-color: var(--background-primary);
+}
+
+.task-columns-row:nth-child(odd) .task-columns-cell {
+  background-color: var(--background-secondary-alt, var(--background-secondary));
+}
+
+.task-columns-cell {
+  vertical-align: top;
+  padding: var(--size-4-2, 8px) var(--size-4-3, 12px);
+  border-bottom: 1px solid var(--background-modifier-border);
+  border-right: 1px solid var(--background-modifier-border);
+}
+
+.task-columns-cell:last-child {
+  border-right: none;
+}
+
+.task-columns-cell:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+/* 日付セル（左端固定） */
+.task-columns-date-cell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 5.5em;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  background-color: inherit;
+}
+
+/* 「カテゴリを追加」列の下の余白セル（クリック不可・装飾のみ） */
+.task-columns-add-category-spacer {
+  background-color: transparent;
+  border-right: none;
+}
+
+/* 1セル内の各タスク */
 .task-columns-task {
   padding: 2px 0;
 }
@@ -171,7 +176,7 @@
   text-decoration: underline;
 }
 
-/* 空の task-item にカーソルを合わせたときの「タスク追加」導線（任意の拡張ポイント） */
+/* 空セルにカーソルを合わせたときの「タスク追加」導線（任意の拡張ポイント） */
 .task-columns-cell-add-task {
   display: none;
   font-size: 0.85em;
@@ -179,6 +184,6 @@
   cursor: pointer;
 }
 
-.task-columns-task-item:hover .task-columns-cell-add-task {
+.task-columns-cell:hover .task-columns-cell-add-task {
   display: inline-block;
 }
