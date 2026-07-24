@@ -27,8 +27,10 @@
         "typescript-eslint": "^8.59.1"
     },
     "dependencies": {
+        "date-fns": "^4.4.0",
         "react": "^19.2.7",
         "react-dom": "^19.2.7",
+        "react-virtuoso": "^4.18.11",
         "zustand": "^5.0.14"
     }
 }
