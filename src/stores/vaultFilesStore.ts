@@ -1,24 +1,63 @@
 import { create } from "zustand";
 import { App, TFile, TFolder } from "obsidian";
 import TaskColumnsPlugin from "../main";
+import TaskModel from "../models/taskModel";
 
 interface VaultFilesState {
-    files: TFile[];
+    fileGroups: Map<string, TaskModel[]>;
     folders: TFolder[];
     refresh: (app: App, plugin: TaskColumnsPlugin) => void;
+    update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => void;
 }
 
-export const useVaultFilesStore = create<VaultFilesState>((set) => ({
-    files: [],
+export const useVaultFilesStore = create<VaultFilesState>((set, get) => ({
+    fileGroups: new Map<string, TaskModel[]>(),
     folders: [],
     refresh: (app: App, plugin: TaskColumnsPlugin) => {
         const targetFolder = plugin.settings.targetFolder;
-        const files = app.vault
+
+        // ファイルを日付・フォルダごとにグループ化
+        const fileGroups = new Map();
+        app.vault
             .getMarkdownFiles()
-            .filter((file) => file.path.startsWith(targetFolder + '/'));
+            .filter((file) => file.path.startsWith(targetFolder + '/'))
+            .map((file) => TaskModel.fromFile(file, app))
+            .forEach((taskModel) => {
+                if (!fileGroups.has(taskModel.cellKey)) {
+                    fileGroups.set(taskModel.cellKey, []);
+                }
+                fileGroups.get(taskModel.cellKey)?.push(taskModel);
+            });
+
+        // フォルダーを取得
         const folders = app.vault
             .getAllFolders()
             .filter((folder) => folder.path.startsWith(targetFolder + '/'));
-        set({ files: files, folders: folders });
+
+        // ステートを更新
+        set({ fileGroups: fileGroups, folders: folders });
+    },
+
+    update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => {
+        console.log('update1', file.path);
+        const targetFolder = plugin.settings.targetFolder;
+        if (!file.path.startsWith(targetFolder + '/')) {
+            return;
+        }
+        console.log('update2');
+
+        const taskModel = TaskModel.fromFile(file, app);
+        const fileGroups = get().fileGroups;
+        if (!fileGroups.has(taskModel.cellKey)) {
+            fileGroups.set(taskModel.cellKey, []);
+        }
+        const newFileGroup = fileGroups.get(taskModel.cellKey)
+            ?.filter((task) => task.taskKey !== taskModel.taskKey) ?? [];
+        newFileGroup.push(taskModel);
+        fileGroups.set(taskModel.cellKey, newFileGroup);
+
+        console.log('update3', fileGroups);
+
+        set({ fileGroups: new Map(fileGroups) });
     },
 }));

@@ -38,7 +38,7 @@ export class TaskColumnsView extends ItemView {
 
         // ファイルと設定の変更イベント監視 → storeを更新
         this.registerEvent(
-            this.app.vault.on("modify", () => useVaultFilesStore.getState().refresh(this.app, this.plugin))
+            this.app.metadataCache.on("changed", (file) => useVaultFilesStore.getState().update(file, this.app, this.plugin))
         );
         this.registerEvent(
             this.app.vault.on("rename", () => useVaultFilesStore.getState().refresh(this.app, this.plugin))

@@ -34,6 +34,9 @@ export default defineConfig(
     {
         rules: {
             'obsidianmd/settings-tab/prefer-setting-definitions': 'off',
+            "semi": ["error", "always"],
+            "comma-dangle": ["error", "always-multiline"],
+            "quotes": ["error", "single"],
         },
     },
 );

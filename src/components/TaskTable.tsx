@@ -1,46 +1,50 @@
 import { addDays, format } from "date-fns";
-import { useEffect, useRef, useState } from "react";
-import { TableVirtuoso, Virtuoso, VirtuosoHandle } from 'react-virtuoso'
-
-interface TaskItem {
-    content: string | undefined;
-}
-interface Folder {
-    name: string;
-    tasks: TaskItem[];
-}
-interface TasksOfDay {
-    date: Date;
-    folders: Folder[];
-}
+import { useRef, useState } from "react";
+import { TableVirtuoso, VirtuosoHandle } from 'react-virtuoso'
+import HeaderRow from "./HeaderRow";
+import { useVaultFilesStore } from "../stores/vaultFilesStore";
+import TaskCell from "./TaskCell";
 
 // ダミー初期データ
-const folderNames = ['フォルダ1', 'フォルダ2'];
-const folders = folderNames.map((name) => ({ name, tasks: [] }));
-const initialData = Array.from({ length: 40 }, (_, i) => ({ date: addDays(new Date(), i), folders: folders }));
+interface TaskItem {
+    date: Date;
+    folder: string;
+    title: string;
+}
+
+const dummyFiles = [
+    { date: new Date(2026, 7, 1), folder: 'カテゴリ1', title: 'ファイル1' },
+    { date: new Date(2026, 7, 2), folder: 'カテゴリ1', title: 'ファイル2' },
+    { date: new Date(2026, 7, 3), folder: 'カテゴリ1', title: 'ファイル3' },
+    { date: new Date(2026, 7, 4), folder: 'カテゴリ1', title: 'ファイル4' },
+    { date: new Date(2026, 7, 5), folder: 'カテゴリ2', title: 'ファイル5' },
+    { date: new Date(2026, 7, 6), folder: 'カテゴリ2', title: 'ファイル6' },
+    { date: new Date(2026, 7, 7), folder: 'カテゴリ2', title: 'ファイル7' },
+    { date: new Date(2026, 7, 8), folder: 'カテゴリ2', title: 'ファイル8' },
+    { date: new Date(2026, 7, 9), folder: 'カテゴリ3', title: 'ファイル9' },
+];
 
 const TaskTable = () => {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
-    const [items, setItems] = useState<TasksOfDay[]>(initialData);
+    const folders = useVaultFilesStore(state => state.folders);
+    const [items, setItems] = useState<TaskItem[]>(dummyFiles);
     const [firstItemIndex, setFirstItemIndex] = useState(10000);
 
     const prependItems = () => {
-        console.log('prependItems');
         setFirstItemIndex(firstItemIndex - 20);
         setItems((prev) => {
-            const firstItem = prev[0] ?? { date: new Date(), folders: folders };
+            const firstItem = prev[0] ?? { date: new Date(), folder: 'カテゴリX', title: 'ファイルX' };
             const firstDate = firstItem.date;
-            const newItems = Array.from({ length: 20 }, (_, i) => ({ date: addDays(firstDate, -20 + i), folders: folders }));
+            const newItems = Array.from({ length: 20 }, (_, i) => ({ date: addDays(firstDate, -20 + i), folder: 'カテゴリX', title: 'ファイルX' }));
             return [...newItems, ...prev];
         });
     }
 
     const appendItems = () => {
-        console.log('appendItems');
         setItems((prev) => {
-            const lastItem = prev[prev.length - 1] ?? { date: new Date(), folders: folders };
+            const lastItem = prev[prev.length - 1] ?? { date: new Date(), folder: 'カテゴリX', title: 'ファイルX' };
             const lastDate = lastItem.date;
-            const newItems = Array.from({ length: 20 }, (_, i) => ({ date: addDays(lastDate, 1 + i), folders: folders }));
+            const newItems = Array.from({ length: 20 }, (_, i) => ({ date: addDays(lastDate, 1 + i), folder: 'カテゴリX', title: 'ファイルX' }));
             return [...prev, ...newItems];
         });
     }
@@ -68,29 +72,14 @@ const TaskTable = () => {
                     />
                 )
             }}
-            fixedHeaderContent={() => (
-                <tr className="task-columns-header-row">
-                    <th className="task-columns-header-cell task-columns-date-header">
-                        <span className="task-columns-header-label">日付</span>
-                        <span className="task-columns-header-menu-icon" aria-hidden="true">▾</span>
-                    </th>
-
-                    <th className="task-columns-header-cell task-columns-category-header">
-                        <span className="task-columns-header-label">フォルダ1</span>
-                        <span className="task-columns-header-menu-icon" aria-hidden="true">▾</span>
-                    </th>
-                    <th className="task-columns-header-cell task-columns-category-header">
-                        <span className="task-columns-header-label">フォルダ2</span>
-                        <span className="task-columns-header-menu-icon" aria-hidden="true">▾</span>
-                    </th>
-                </tr>
-            )}
-            itemContent={(index, item) => {
+            fixedHeaderContent={HeaderRow}
+            itemContent={(_index, item) => {
                 return (
                     <>
                         <td className="task-columns-cell task-columns-date-cell">{format(item.date, 'yyyy/MM/dd')}</td>
-                        <td className="task-columns-cell"></td>
-                        <td className="task-columns-cell"></td>
+                        {folders.map((folder) => (
+                            <TaskCell date={item.date} folder={folder.name} />
+                        ))}
                     </>
                 );
             }}
