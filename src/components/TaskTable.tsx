@@ -65,12 +65,16 @@ const TaskTable = () => {
                         className="task-columns-table"
                     />
                 ),
-                TableRow: (props) => (
-                    <tr
-                        {...props}
-                        className="task-columns-row"
-                    />
-                )
+                TableRow: (props) => {
+                    const index = Number(props['data-index']);
+                    const parityClass = index % 2 === 0 ? 'task-columns-row-even' : 'task-columns-row-odd';
+                    return (
+                        <tr
+                            {...props}
+                            className={`task-columns-row ${parityClass}`}
+                        />
+                    );
+                }
             }}
             fixedHeaderContent={HeaderRow}
             itemContent={(_index, item) => {

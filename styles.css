@@ -118,11 +118,11 @@
 }
 
 /* データ行 */
-.task-columns-row:nth-child(even) .task-columns-cell {
+.task-columns-row-even .task-columns-cell {
   background-color: var(--background-primary);
 }
 
-.task-columns-row:nth-child(odd) .task-columns-cell {
+.task-columns-row-odd .task-columns-cell {
   background-color: var(--background-secondary-alt, var(--background-secondary));
 }
 
