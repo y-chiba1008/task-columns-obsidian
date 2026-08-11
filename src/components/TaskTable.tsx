@@ -5,46 +5,25 @@ import HeaderRow from "./HeaderRow";
 import { useVaultFilesStore } from "../stores/vaultFilesStore";
 import TaskCell from "./TaskCell";
 
-// ダミー初期データ
-interface TaskItem {
-    date: Date;
-    folder: string;
-    title: string;
-}
-
-const dummyFiles = [
-    { date: new Date(2026, 7, 1), folder: 'カテゴリ1', title: 'ファイル1' },
-    { date: new Date(2026, 7, 2), folder: 'カテゴリ1', title: 'ファイル2' },
-    { date: new Date(2026, 7, 3), folder: 'カテゴリ1', title: 'ファイル3' },
-    { date: new Date(2026, 7, 4), folder: 'カテゴリ1', title: 'ファイル4' },
-    { date: new Date(2026, 7, 5), folder: 'カテゴリ2', title: 'ファイル5' },
-    { date: new Date(2026, 7, 6), folder: 'カテゴリ2', title: 'ファイル6' },
-    { date: new Date(2026, 7, 7), folder: 'カテゴリ2', title: 'ファイル7' },
-    { date: new Date(2026, 7, 8), folder: 'カテゴリ2', title: 'ファイル8' },
-    { date: new Date(2026, 7, 9), folder: 'カテゴリ3', title: 'ファイル9' },
-];
-
 const TaskTable = () => {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
     const folders = useVaultFilesStore(state => state.folders);
-    const [items, setItems] = useState<TaskItem[]>(dummyFiles);
+    const [items, setItems] = useState<Date[]>([new Date()]);
     const [firstItemIndex, setFirstItemIndex] = useState(10000);
 
     const prependItems = () => {
         setFirstItemIndex(firstItemIndex - 20);
         setItems((prev) => {
-            const firstItem = prev[0] ?? { date: new Date(), folder: 'カテゴリX', title: 'ファイルX' };
-            const firstDate = firstItem.date;
-            const newItems = Array.from({ length: 20 }, (_, i) => ({ date: addDays(firstDate, -20 + i), folder: 'カテゴリX', title: 'ファイルX' }));
+            const firstDate = prev[0] ?? new Date();
+            const newItems = Array.from({ length: 20 }, (_, i) => addDays(firstDate, -20 + i));
             return [...newItems, ...prev];
         });
     }
 
     const appendItems = () => {
         setItems((prev) => {
-            const lastItem = prev[prev.length - 1] ?? { date: new Date(), folder: 'カテゴリX', title: 'ファイルX' };
-            const lastDate = lastItem.date;
-            const newItems = Array.from({ length: 20 }, (_, i) => ({ date: addDays(lastDate, 1 + i), folder: 'カテゴリX', title: 'ファイルX' }));
+            const lastDate = prev[prev.length - 1] ?? new Date();
+            const newItems = Array.from({ length: 20 }, (_, i) => addDays(lastDate, 1 + i));
             return [...prev, ...newItems];
         });
     }
@@ -80,9 +59,9 @@ const TaskTable = () => {
             itemContent={(_index, item) => {
                 return (
                     <>
-                        <td className="task-columns-cell task-columns-date-cell">{format(item.date, 'yyyy/MM/dd')}</td>
+                        <td className="task-columns-cell task-columns-date-cell">{format(item, 'yyyy/MM/dd')}</td>
                         {folders.map((folder) => (
-                            <TaskCell date={item.date} folder={folder.name} />
+                            <TaskCell date={item} folder={folder.name} />
                         ))}
                     </>
                 );
