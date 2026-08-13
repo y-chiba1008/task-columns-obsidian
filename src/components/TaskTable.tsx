@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { TableVirtuoso, VirtuosoHandle } from 'react-virtuoso'
 import HeaderRow from "./HeaderRow";
 import { useVaultFilesStore } from "../stores/vaultFilesStore";
-import TaskCell from "./TaskCell";
+import DataRow from "./DataRow";
 
 const TaskTable = () => {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
@@ -53,19 +53,18 @@ const TaskTable = () => {
                             className={`task-columns-row ${parityClass}`}
                         />
                     );
-                }
+                },
+                TableFoot: (props) => (
+                    <tfoot {...props} className="task-columns-footer" />
+                ),
             }}
             fixedHeaderContent={HeaderRow}
-            itemContent={(_index, item) => {
-                return (
-                    <>
-                        <td className="task-columns-cell task-columns-date-cell">{format(item, 'yyyy/MM/dd')}</td>
-                        {folders.map((folder) => (
-                            <TaskCell date={item} folder={folder.name} />
-                        ))}
-                    </>
-                );
-            }}
+            itemContent={(_index, item) => <DataRow date={item} />}
+            fixedFooterContent={() => (
+                <tr className="task-columns-footer-row">
+                    <DataRow date={null} />
+                </tr>
+            )}
         />
     );
 };

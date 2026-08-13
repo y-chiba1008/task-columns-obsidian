@@ -89,6 +89,23 @@
   min-width: 10em;
 }
 
+/* フッタ行・フッタセル（下端固定） */
+.task-columns-footer-row {
+  background-color: var(--background-secondary);
+}
+
+.task-columns-footer-row .task-columns-cell {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background-color: var(--background-secondary);
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.task-columns-footer-row .task-columns-date-cell {
+  z-index: 3;
+}
+
 /* 「カテゴリを追加」ヘッダセル */
 .task-columns-add-category-header {
   min-width: 8em;

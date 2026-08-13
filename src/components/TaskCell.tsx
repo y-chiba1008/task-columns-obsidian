@@ -1,7 +1,7 @@
 import { generateCellKey } from "../common";
 import { useVaultFilesStore } from "../stores/vaultFilesStore";
 
-const TaskCell = ({ date, folder }: { date: Date, folder: string }) => {
+const TaskCell = ({ date, folder }: { date: Date | null, folder: string }) => {
     const cellKey = generateCellKey(date, folder);
     const fileGroups = useVaultFilesStore(state => state.fileGroups);
     const tasks = fileGroups.get(cellKey) ?? [];

@@ -4,7 +4,7 @@ import { generateCellKey } from "../common";
 
 class TaskModel {
     constructor(
-        public readonly date: Date,
+        public readonly date: Date | null,
         public readonly folder: string,
         public readonly title: string,
     ) { }
@@ -12,7 +12,7 @@ class TaskModel {
     public static fromFile(file: TFile, app: App): TaskModel {
         const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
         return new TaskModel(
-            frontmatter?.date ? new Date(frontmatter.date) : new Date(),
+            frontmatter?.date ? new Date(frontmatter.date) : null,
             file.parent?.name ?? '',
             file.basename,
         );
