@@ -28,6 +28,9 @@ export const useVaultFilesStore = create<VaultFilesState>((set) => ({
                 }
                 fileGroups.get(taskModel.cellKey)?.push(taskModel);
             });
+        for (const [cellKey, tasks] of fileGroups) {
+            fileGroups.set(cellKey, TaskModel.sortTasks(tasks));
+        }
 
         // フォルダーを取得
         const folders = app.vault
@@ -47,12 +50,21 @@ export const useVaultFilesStore = create<VaultFilesState>((set) => ({
         const taskModel = TaskModel.fromFile(file, app);
         set((state) => {
             const nextFileGroups = new Map(state.fileGroups);
+
+            for (const [cellKey, tasks] of nextFileGroups) {
+                const filtered = tasks.filter((task) => task.path !== taskModel.path);
+                if (filtered.length === tasks.length) {
+                    continue;
+                }
+                if (filtered.length === 0) {
+                    nextFileGroups.delete(cellKey);
+                } else {
+                    nextFileGroups.set(cellKey, filtered);
+                }
+            }
+
             const prevTasks = nextFileGroups.get(taskModel.cellKey) ?? [];
-            const nextTasks = [
-                ...prevTasks.filter((task) => task.taskKey !== taskModel.taskKey),
-                taskModel,
-            ];
-            nextFileGroups.set(taskModel.cellKey, nextTasks);
+            nextFileGroups.set(taskModel.cellKey, TaskModel.sortTasks([...prevTasks, taskModel]));
             return { fileGroups: nextFileGroups };
         });
     },
