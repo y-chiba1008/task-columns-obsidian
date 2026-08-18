@@ -1,13 +1,14 @@
 import { generateCellKey } from "../common";
+import TaskModel from "../models/taskModel";
 import { useVaultFilesStore } from "../stores/vaultFilesStore";
+
+const EMPTY_TASKS: TaskModel[] = [];
 
 const TaskCell = ({ date, folder }: { date: Date | null, folder: string }) => {
     const cellKey = generateCellKey(date, folder);
-    const fileGroups = useVaultFilesStore(state => state.fileGroups);
-    const tasks = fileGroups.get(cellKey) ?? [];
-    if (tasks.length > 0) {
-        console.log('TaskCell', tasks);
-    }
+    const tasks = useVaultFilesStore(
+        (state) => state.fileGroups.get(cellKey) ?? EMPTY_TASKS,
+    );
 
     return (
         <td className="task-columns-cell" key={cellKey}>

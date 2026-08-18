@@ -10,7 +10,7 @@ interface VaultFilesState {
     update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => void;
 }
 
-export const useVaultFilesStore = create<VaultFilesState>((set, get) => ({
+export const useVaultFilesStore = create<VaultFilesState>((set) => ({
     fileGroups: new Map<string, TaskModel[]>(),
     folders: [],
     refresh: (app: App, plugin: TaskColumnsPlugin) => {
@@ -39,25 +39,21 @@ export const useVaultFilesStore = create<VaultFilesState>((set, get) => ({
     },
 
     update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => {
-        console.log('update1', file.path);
         const targetFolder = plugin.settings.targetFolder;
         if (!file.path.startsWith(targetFolder + '/')) {
             return;
         }
-        console.log('update2');
 
         const taskModel = TaskModel.fromFile(file, app);
-        const fileGroups = get().fileGroups;
-        if (!fileGroups.has(taskModel.cellKey)) {
-            fileGroups.set(taskModel.cellKey, []);
-        }
-        const newFileGroup = fileGroups.get(taskModel.cellKey)
-            ?.filter((task) => task.taskKey !== taskModel.taskKey) ?? [];
-        newFileGroup.push(taskModel);
-        fileGroups.set(taskModel.cellKey, newFileGroup);
-
-        console.log('update3', fileGroups);
-
-        set({ fileGroups: new Map(fileGroups) });
+        set((state) => {
+            const nextFileGroups = new Map(state.fileGroups);
+            const prevTasks = nextFileGroups.get(taskModel.cellKey) ?? [];
+            const nextTasks = [
+                ...prevTasks.filter((task) => task.taskKey !== taskModel.taskKey),
+                taskModel,
+            ];
+            nextFileGroups.set(taskModel.cellKey, nextTasks);
+            return { fileGroups: nextFileGroups };
+        });
     },
 }));
