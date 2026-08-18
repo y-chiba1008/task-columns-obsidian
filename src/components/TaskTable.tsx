@@ -50,13 +50,11 @@ const TaskTable = () => {
                     return (
                         <tr
                             {...props}
-                            className={`task-columns-row ${parityClass}`}
+                            className={parityClass}
                         />
                     );
                 },
-                TableFoot: (props) => (
-                    <tfoot {...props} className="task-columns-footer" />
-                ),
+                TableFoot: (props) => <tfoot {...props} />,
             }}
             fixedHeaderContent={HeaderRow}
             itemContent={(_index, item) => <DataRow date={item} />}
