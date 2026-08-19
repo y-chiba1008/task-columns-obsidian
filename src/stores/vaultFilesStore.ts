@@ -5,6 +5,7 @@ import TaskColumnsPlugin from "../main";
 import TaskModel from "../models/taskModel";
 
 interface VaultFilesState {
+    app: App | null;
     fileGroups: Map<string, TaskModel[]>;
     folders: TFolder[];
     refresh: (app: App, plugin: TaskColumnsPlugin) => void;
@@ -12,6 +13,7 @@ interface VaultFilesState {
 }
 
 export const useVaultFilesStore = create<VaultFilesState>((set) => ({
+    app: null,
     fileGroups: new Map<string, TaskModel[]>(),
     folders: [],
     refresh: (app: App, plugin: TaskColumnsPlugin) => {
@@ -42,7 +44,7 @@ export const useVaultFilesStore = create<VaultFilesState>((set) => ({
             .filter((folder) => !isUnderExcludedPath(folder.path, excludedFolders));
 
         // ステートを更新
-        set({ fileGroups: fileGroups, folders: folders });
+        set({ app, fileGroups: fileGroups, folders: folders });
     },
 
     update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => {
