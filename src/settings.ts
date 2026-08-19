@@ -4,10 +4,12 @@ import { FolderSuggest } from './ui/folderSuggest';
 
 export interface TaskColumnsSettings {
     targetFolder: string;
+    excludedFolders: string;
 }
 
 export const DEFAULT_SETTINGS: TaskColumnsSettings = {
     targetFolder: '',
+    excludedFolders: '',
 };
 
 export class TaskColumnsSettingTab extends PluginSettingTab {
@@ -39,6 +41,20 @@ export class TaskColumnsSettingTab extends PluginSettingTab {
                     this.plugin.settings.targetFolder = folder.path;
                     this.plugin.saveSettings().catch(() => new Notice('Failed to save settings.'));
                 });
+            });
+
+        new Setting(containerEl)
+            .setName('Excluded folders')
+            .setDesc('One folder path per line (relative to vault). Matching folders and their contents are hidden from the table.')
+            .addTextArea((text) => {
+                text
+                    .setPlaceholder('Example:\nfolder1/excluded\narchive')
+                    .setValue(this.plugin.settings.excludedFolders)
+                    .onChange(async (value) => {
+                        this.plugin.settings.excludedFolders = value;
+                        await this.plugin.saveSettings();
+                    });
+                text.inputEl.rows = 5;
             });
     }
 }
