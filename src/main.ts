@@ -5,7 +5,6 @@ import {
     TaskColumnsSettings,
     TaskColumnsSettingTab,
 } from './settings';
-import { TaskColumnsMockView, VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW } from './mockView';
 
 export default class TaskColumnsPlugin extends Plugin {
     settings!: TaskColumnsSettings;
@@ -29,15 +28,6 @@ export default class TaskColumnsPlugin extends Plugin {
         });
 
         this.addSettingTab(new TaskColumnsSettingTab(this.app, this));
-
-        // モック
-        this.registerView(
-            VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW,
-            (leaf) => new TaskColumnsMockView(leaf, this),
-        );
-        this.addRibbonIcon('monitor', 'Open mock view', async () => {
-            await this.activateView(VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW);
-        });
     }
 
     onunload() {
