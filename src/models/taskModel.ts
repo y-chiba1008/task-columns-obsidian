@@ -1,5 +1,5 @@
 import { App, TFile } from "obsidian";
-import { generateCellKey } from "../common";
+import { generateCellKey } from "../utils/keyUtils";
 
 class TaskModel {
     constructor(

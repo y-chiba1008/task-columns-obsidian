@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { useVaultFilesStore } from "../stores/vaultFilesStore";
 import TaskCell from "./TaskCell";
-import { generateCellKey } from "../common";
+import { generateCellKey } from "../utils/keyUtils";
 
 const DataRow = ({date}: {date: Date | null}) => {
     const folders = useVaultFilesStore(state => state.folders);

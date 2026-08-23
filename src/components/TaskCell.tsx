@@ -1,6 +1,6 @@
-import { generateCellKey } from "../common";
 import TaskModel from "../models/taskModel";
 import { useVaultFilesStore } from "../stores/vaultFilesStore";
+import { generateCellKey } from "../utils/keyUtils";
 import { openTaskFile } from "../utils/openTaskFile";
 
 const EMPTY_TASKS: TaskModel[] = [];
