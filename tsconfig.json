@@ -21,7 +21,6 @@
     },
     "include": [
         "src/**/*.ts",
-        "src/**/*.tsx",
-        "docs/mock.html"
+        "src/**/*.tsx"
     ]
 }

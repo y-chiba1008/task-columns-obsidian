@@ -160,37 +160,3 @@
 .task-columns-footer-row .task-columns-date-cell {
   z-index: 3;
 }
-
-/* --- カテゴリ追加（mock / 将来実装用） --- */
-
-.task-columns-add-category-header {
-  min-width: 8em;
-}
-
-.task-columns-add-category-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--task-columns-inline-gap);
-  width: 100%;
-  padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: var(--radius-s, 4px);
-  font-size: var(--font-ui-small);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.task-columns-add-category-button:hover {
-  background-color: var(--interactive-accent-hover);
-}
-
-.task-columns-add-icon {
-  font-weight: 700;
-}
-
-.task-columns-add-category-spacer {
-  background-color: transparent;
-  border-right: none;
-}
