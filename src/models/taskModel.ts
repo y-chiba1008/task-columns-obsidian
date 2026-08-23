@@ -11,9 +11,11 @@ class TaskModel {
 
     public static fromFile(file: TFile, app: App): TaskModel {
         const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
+        const datetime = (frontmatter?.datetime && typeof(frontmatter.datetime) === 'string')
+                            ? new Date(frontmatter.datetime) : null;
         return new TaskModel(
             file.path,
-            frontmatter?.datetime ? new Date(frontmatter.datetime) : null,
+            datetime,
             file.parent?.name ?? '',
             file.basename,
         );
@@ -35,7 +37,7 @@ class TaskModel {
     }
 
     public static sortTasks(tasks: TaskModel[]): TaskModel[] {
-        return [...tasks].sort(TaskModel.compareTasks);
+        return [...tasks].sort((a, b) => TaskModel.compareTasks(a, b));
     }
 }
 

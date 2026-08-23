@@ -1,13 +1,11 @@
-import { addDays, format } from 'date-fns';
+import { addDays } from 'date-fns';
 import { useRef, useState } from 'react';
 import { TableVirtuoso, VirtuosoHandle } from 'react-virtuoso';
 import HeaderRow from './HeaderRow';
-import { useVaultFilesStore } from '../stores/vaultFilesStore';
 import DataRow from './DataRow';
 
 const TaskTable = () => {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
-    const folders = useVaultFilesStore(state => state.folders);
     const [items, setItems] = useState<Date[]>([new Date()]);
     const [firstItemIndex, setFirstItemIndex] = useState(10000);
 

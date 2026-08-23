@@ -21,7 +21,7 @@ export const useVaultFilesStore = create<VaultFilesState>((set) => ({
         const excludedFolders = parseExcludedFolders(plugin.settings.excludedFolders);
 
         // ファイルを日付・フォルダごとにグループ化
-        const fileGroups = new Map();
+        const fileGroups = new Map<string, TaskModel[]>();
         app.vault
             .getMarkdownFiles()
             .filter((file) => file.path.startsWith(targetFolder + '/'))
