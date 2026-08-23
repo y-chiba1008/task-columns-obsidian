@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { TableVirtuoso, VirtuosoHandle } from 'react-virtuoso';
 import HeaderRow from './HeaderRow';
 import DataRow from './DataRow';
+import { isToday } from '../utils/dateDisplayUtils';
 
 const TaskTable = () => {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
@@ -42,13 +43,15 @@ const TaskTable = () => {
                         className="task-columns-table"
                     />
                 ),
-                TableRow: (props) => {
+                TableRow: ({ item, context: _context, ...props }) => {
                     const index = Number(props['data-index']);
-                    const parityClass = index % 2 === 0 ? 'task-columns-row-even' : 'task-columns-row-odd';
+                    const parityClass =
+                        index % 2 === 0 ? 'task-columns-row-even' : 'task-columns-row-odd';
+                    const todayClass = isToday(item) ? 'task-columns-row-today' : '';
                     return (
                         <tr
                             {...props}
-                            className={parityClass}
+                            className={[parityClass, todayClass].filter(Boolean).join(' ')}
                         />
                     );
                 },
