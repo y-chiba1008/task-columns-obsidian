@@ -1,72 +1,86 @@
-import { addDays } from 'date-fns';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { TableVirtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { addDays, startOfDay } from 'date-fns';
+import { useCallback, useRef, useState } from 'react';
+import { TableVirtuoso } from 'react-virtuoso';
 import HeaderRow from './HeaderRow';
 import DataRow from './DataRow';
 import DateNavBar from './DateNavBar';
 import { isToday } from '../utils/dateDisplayUtils';
-import { extendItemsToDate } from '../utils/dateNavUtils';
+import { buildItemsAroundDate, DATE_NAV_BUFFER_DAYS } from '../utils/dateNavUtils';
+
+type DateListState = {
+    items: Date[];
+    firstItemIndex: number;
+    /** Virtuoso を再マウントして初期位置を確実に合わせる */
+    listKey: number;
+};
+
+const createInitialState = (): DateListState => {
+    const window = buildItemsAroundDate(new Date());
+    return {
+        items: window.items,
+        firstItemIndex: window.firstItemIndex,
+        listKey: 0,
+    };
+};
 
 const TaskTable = () => {
-    const virtuosoRef = useRef<VirtuosoHandle>(null);
-    const topDateRef = useRef<Date>(new Date());
-    const pendingScrollIndexRef = useRef<number | null>(null);
-    const [items, setItems] = useState<Date[]>([new Date()]);
-    const [firstItemIndex, setFirstItemIndex] = useState(10000);
+    const topDateRef = useRef<Date>(startOfDay(new Date()));
+    const suppressLoadMoreRef = useRef(false);
+    const suppressTimerRef = useRef<number | null>(null);
+    const [listState, setListState] = useState<DateListState>(createInitialState);
+
+    const releaseSuppressSoon = () => {
+        if (suppressTimerRef.current !== null) {
+            window.clearTimeout(suppressTimerRef.current);
+        }
+        suppressTimerRef.current = window.setTimeout(() => {
+            suppressLoadMoreRef.current = false;
+            suppressTimerRef.current = null;
+        }, 200);
+    };
 
     const prependItems = () => {
-        setFirstItemIndex(firstItemIndex - 20);
-        setItems((prev) => {
-            const firstDate = prev[0] ?? new Date();
-            const newItems = Array.from({ length: 20 }, (_, i) => addDays(firstDate, -20 + i));
-            return [...newItems, ...prev];
+        if (suppressLoadMoreRef.current) return;
+        setListState((prev) => {
+            const firstDate = prev.items[0] ?? new Date();
+            const newItems = Array.from({ length: 20 }, (_, i) =>
+                startOfDay(addDays(firstDate, -20 + i)),
+            );
+            return {
+                ...prev,
+                firstItemIndex: prev.firstItemIndex - 20,
+                items: [...newItems, ...prev.items],
+            };
         });
     };
 
     const appendItems = () => {
-        setItems((prev) => {
-            const lastDate = prev[prev.length - 1] ?? new Date();
-            const newItems = Array.from({ length: 20 }, (_, i) => addDays(lastDate, 1 + i));
-            return [...prev, ...newItems];
+        if (suppressLoadMoreRef.current) return;
+        setListState((prev) => {
+            const lastDate = prev.items[prev.items.length - 1] ?? new Date();
+            const newItems = Array.from({ length: 20 }, (_, i) =>
+                startOfDay(addDays(lastDate, 1 + i)),
+            );
+            return {
+                ...prev,
+                items: [...prev.items, ...newItems],
+            };
         });
     };
 
-    const scrollToAbsoluteIndex = useCallback((index: number, behavior: 'auto' | 'smooth') => {
-        virtuosoRef.current?.scrollToIndex({
-            index,
-            align: 'start',
-            behavior,
-        });
+    const scrollToDate = useCallback((targetDate: Date) => {
+        const target = startOfDay(targetDate);
+        topDateRef.current = target;
+        suppressLoadMoreRef.current = true;
+
+        const window = buildItemsAroundDate(target);
+        setListState((prev) => ({
+            items: window.items,
+            firstItemIndex: window.firstItemIndex,
+            listKey: prev.listKey + 1,
+        }));
+        releaseSuppressSoon();
     }, []);
-
-    useEffect(() => {
-        if (pendingScrollIndexRef.current === null) return;
-        const index = pendingScrollIndexRef.current;
-        pendingScrollIndexRef.current = null;
-        // データ拡張後に Virtuoso がインデックスを取り込んでからスクロールする
-        window.requestAnimationFrame(() => {
-            scrollToAbsoluteIndex(index, 'auto');
-        });
-    }, [items, firstItemIndex, scrollToAbsoluteIndex]);
-
-    const scrollToDate = useCallback(
-        (targetDate: Date) => {
-            topDateRef.current = targetDate;
-            const result = extendItemsToDate(items, firstItemIndex, targetDate);
-
-            if (!result.changed) {
-                scrollToAbsoluteIndex(result.scrollIndex, 'smooth');
-                return;
-            }
-
-            pendingScrollIndexRef.current = result.scrollIndex;
-            if (result.firstItemIndex !== firstItemIndex) {
-                setFirstItemIndex(result.firstItemIndex);
-            }
-            setItems(result.items);
-        },
-        [items, firstItemIndex, scrollToAbsoluteIndex],
-    );
 
     return (
         <div className="task-columns-table-layout">
@@ -75,18 +89,19 @@ const TaskTable = () => {
                 onNavigate={scrollToDate}
             />
             <TableVirtuoso
+                key={listState.listKey}
                 className="task-columns-table-wrapper"
-                ref={virtuosoRef}
-                data={items}
+                data={listState.items}
                 startReached={prependItems}
                 endReached={appendItems}
-                firstItemIndex={firstItemIndex}
-                initialTopMostItemIndex={0}
+                firstItemIndex={listState.firstItemIndex}
+                initialTopMostItemIndex={DATE_NAV_BUFFER_DAYS}
                 rangeChanged={(range) => {
-                    const relativeIndex = range.startIndex - firstItemIndex;
-                    const date = items[relativeIndex];
+                    if (suppressLoadMoreRef.current) return;
+                    const relativeIndex = range.startIndex - listState.firstItemIndex;
+                    const date = listState.items[relativeIndex];
                     if (date) {
-                        topDateRef.current = date;
+                        topDateRef.current = startOfDay(date);
                     }
                 }}
                 components={{

@@ -1,4 +1,4 @@
-import { addMonths, addWeeks, format, parse } from 'date-fns';
+import { addMonths, addWeeks, format, parse, startOfDay } from 'date-fns';
 import { SubmitEventHandler, useState } from 'react';
 
 type DateNavBarProps = {
@@ -12,7 +12,7 @@ const DateNavBar = ({ getAnchorDate, onNavigate }: DateNavBarProps) => {
     const goToInputDate = () => {
         const parsed = parse(dateValue, 'yyyy-MM-dd', new Date());
         if (Number.isNaN(parsed.getTime())) return;
-        onNavigate(parsed);
+        onNavigate(startOfDay(parsed));
     };
 
     const onSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
@@ -20,12 +20,16 @@ const DateNavBar = ({ getAnchorDate, onNavigate }: DateNavBarProps) => {
         goToInputDate();
     };
 
+    const shiftFromAnchor = (shift: (date: Date) => Date) => {
+        onNavigate(startOfDay(shift(getAnchorDate())));
+    };
+
     return (
         <div className="task-columns-date-nav" role="toolbar" aria-label="日付移動">
             <button
                 type="button"
                 className="task-columns-date-nav-button"
-                onClick={() => onNavigate(new Date())}
+                onClick={() => onNavigate(startOfDay(new Date()))}
             >
                 今日
             </button>
@@ -34,14 +38,14 @@ const DateNavBar = ({ getAnchorDate, onNavigate }: DateNavBarProps) => {
                 <button
                     type="button"
                     className="task-columns-date-nav-button"
-                    onClick={() => onNavigate(addMonths(getAnchorDate(), -1))}
+                    onClick={() => shiftFromAnchor((d) => addMonths(d, -1))}
                 >
                     1か月戻る
                 </button>
                 <button
                     type="button"
                     className="task-columns-date-nav-button"
-                    onClick={() => onNavigate(addWeeks(getAnchorDate(), -1))}
+                    onClick={() => shiftFromAnchor((d) => addWeeks(d, -1))}
                 >
                     1週間戻る
                 </button>
@@ -64,14 +68,14 @@ const DateNavBar = ({ getAnchorDate, onNavigate }: DateNavBarProps) => {
                 <button
                     type="button"
                     className="task-columns-date-nav-button"
-                    onClick={() => onNavigate(addWeeks(getAnchorDate(), 1))}
+                    onClick={() => shiftFromAnchor((d) => addWeeks(d, 1))}
                 >
                     1週間進む
                 </button>
                 <button
                     type="button"
                     className="task-columns-date-nav-button"
-                    onClick={() => onNavigate(addMonths(getAnchorDate(), 1))}
+                    onClick={() => shiftFromAnchor((d) => addMonths(d, 1))}
                 >
                     1か月進む
                 </button>
