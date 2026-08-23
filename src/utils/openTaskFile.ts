@@ -1,4 +1,4 @@
-import { App, MarkdownView, TFile, WorkspaceLeaf } from "obsidian";
+import { App, MarkdownView, TFile, WorkspaceLeaf } from 'obsidian';
 
 export async function openTaskFile(app: App, path: string): Promise<void> {
     const file = app.vault.getAbstractFileByPath(path);
@@ -22,6 +22,6 @@ export async function openTaskFile(app: App, path: string): Promise<void> {
         return;
     }
 
-    const leaf = app.workspace.getLeaf("tab");
+    const leaf = app.workspace.getLeaf('tab');
     await leaf.openFile(file);
 }

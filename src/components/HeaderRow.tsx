@@ -1,4 +1,4 @@
-import { useVaultFilesStore } from "../stores/vaultFilesStore";
+import { useVaultFilesStore } from '../stores/vaultFilesStore';
 
 const HeaderRow = () => {
     const folders = useVaultFilesStore(state => state.folders);

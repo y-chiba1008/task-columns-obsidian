@@ -1,11 +1,11 @@
-import { ItemView, TFile, WorkspaceLeaf } from "obsidian";
-import { StrictMode } from "react";
-import { Root, createRoot } from "react-dom/client";
-import ViewRoot from "./components/ViewRoot";
-import { useVaultFilesStore } from "./stores/vaultFilesStore";
-import TaskColumnsPlugin from "./main";
+import { ItemView, TFile, WorkspaceLeaf } from 'obsidian';
+import { StrictMode } from 'react';
+import { Root, createRoot } from 'react-dom/client';
+import ViewRoot from './components/ViewRoot';
+import { useVaultFilesStore } from './stores/vaultFilesStore';
+import TaskColumnsPlugin from './main';
 
-export const VIEW_TYPE_TASK_COLUMNS_VIEW = "task-columns-view";
+export const VIEW_TYPE_TASK_COLUMNS_VIEW = 'task-columns-view';
 
 const METADATA_UPDATE_DEBOUNCE_MS = 200;
 
@@ -24,11 +24,11 @@ export class TaskColumnsView extends ItemView {
     }
 
     getDisplayText(): string {
-        return "Task columns view";
+        return 'Task columns view';
     }
 
     getIcon(): string {
-        return "dice"; // Obsidian組み込みのlucideアイコン名
+        return 'dice'; // Obsidian組み込みのlucideアイコン名
     }
 
     async onOpen() {
@@ -41,25 +41,25 @@ export class TaskColumnsView extends ItemView {
 
         // ファイルと設定の変更イベント監視 → storeを更新
         this.registerEvent(
-            this.app.metadataCache.on("changed", (file) => this.scheduleMetadataUpdate(file))
+            this.app.metadataCache.on('changed', (file) => this.scheduleMetadataUpdate(file)),
         );
         this.registerEvent(
-            this.app.vault.on("rename", () => useVaultFilesStore.getState().refresh(this.app, this.plugin))
+            this.app.vault.on('rename', () => useVaultFilesStore.getState().refresh(this.app, this.plugin)),
         );
         this.registerEvent(
-            this.app.vault.on("create", () => useVaultFilesStore.getState().refresh(this.app, this.plugin))
+            this.app.vault.on('create', () => useVaultFilesStore.getState().refresh(this.app, this.plugin)),
         );
         this.registerEvent(
-            this.app.vault.on("delete", () => useVaultFilesStore.getState().refresh(this.app, this.plugin))
+            this.app.vault.on('delete', () => useVaultFilesStore.getState().refresh(this.app, this.plugin)),
         );
         this.registerEvent(
-            this.plugin.settingsEvents.on("changed", () => useVaultFilesStore.getState().refresh(this.app, this.plugin))
+            this.plugin.settingsEvents.on('changed', () => useVaultFilesStore.getState().refresh(this.app, this.plugin)),
         );
 
         this.root.render(
             <StrictMode>
                 <ViewRoot />
-            </StrictMode>
+            </StrictMode>,
         );
     }
 

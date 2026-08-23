@@ -1,8 +1,8 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
-import mockViewHtml from "../mocks/mock.html";
-import TaskColumnsPlugin from "./main";
+import { ItemView, WorkspaceLeaf } from 'obsidian';
+import mockViewHtml from '../mocks/mock.html';
+import TaskColumnsPlugin from './main';
 
-export const VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW = "task-columns--mock-view";
+export const VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW = 'task-columns--mock-view';
 
 export class TaskColumnsMockView extends ItemView {
     private plugin: TaskColumnsPlugin;
@@ -17,11 +17,11 @@ export class TaskColumnsMockView extends ItemView {
     }
 
     getDisplayText(): string {
-        return "Task columns mock view";
+        return 'Task columns mock view';
     }
 
     getIcon(): string {
-        return "monitor"; // Obsidian組み込みのlucideアイコン名
+        return 'monitor'; // Obsidian組み込みのlucideアイコン名
     }
 
     async onOpen() {

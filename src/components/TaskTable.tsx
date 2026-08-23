@@ -1,9 +1,9 @@
-import { addDays, format } from "date-fns";
-import { useRef, useState } from "react";
-import { TableVirtuoso, VirtuosoHandle } from 'react-virtuoso'
-import HeaderRow from "./HeaderRow";
-import { useVaultFilesStore } from "../stores/vaultFilesStore";
-import DataRow from "./DataRow";
+import { addDays, format } from 'date-fns';
+import { useRef, useState } from 'react';
+import { TableVirtuoso, VirtuosoHandle } from 'react-virtuoso';
+import HeaderRow from './HeaderRow';
+import { useVaultFilesStore } from '../stores/vaultFilesStore';
+import DataRow from './DataRow';
 
 const TaskTable = () => {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
@@ -18,7 +18,7 @@ const TaskTable = () => {
             const newItems = Array.from({ length: 20 }, (_, i) => addDays(firstDate, -20 + i));
             return [...newItems, ...prev];
         });
-    }
+    };
 
     const appendItems = () => {
         setItems((prev) => {
@@ -26,7 +26,7 @@ const TaskTable = () => {
             const newItems = Array.from({ length: 20 }, (_, i) => addDays(lastDate, 1 + i));
             return [...prev, ...newItems];
         });
-    }
+    };
 
     return (
         <TableVirtuoso

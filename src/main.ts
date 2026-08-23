@@ -1,11 +1,11 @@
-import { Events, Plugin, WorkspaceLeaf } from "obsidian";
-import { TaskColumnsView, VIEW_TYPE_TASK_COLUMNS_VIEW } from "./view";
+import { Events, Plugin, WorkspaceLeaf } from 'obsidian';
+import { TaskColumnsView, VIEW_TYPE_TASK_COLUMNS_VIEW } from './view';
 import {
     DEFAULT_SETTINGS,
     TaskColumnsSettings,
     TaskColumnsSettingTab,
 } from './settings';
-import { TaskColumnsMockView, VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW } from "./mockView";
+import { TaskColumnsMockView, VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW } from './mockView';
 
 export default class TaskColumnsPlugin extends Plugin {
     settings!: TaskColumnsSettings;
@@ -15,16 +15,16 @@ export default class TaskColumnsPlugin extends Plugin {
         await this.loadSettings();
         this.registerView(
             VIEW_TYPE_TASK_COLUMNS_VIEW,
-            (leaf) => new TaskColumnsView(leaf, this)
+            (leaf) => new TaskColumnsView(leaf, this),
         );
 
-        this.addRibbonIcon("dice", "Open my view", async () => {
+        this.addRibbonIcon('dice', 'Open my view', async () => {
             await this.activateView(VIEW_TYPE_TASK_COLUMNS_VIEW);
         });
 
         this.addCommand({
-            id: "open-tasks-view",
-            name: "Open tasks view",
+            id: 'open-tasks-view',
+            name: 'Open tasks view',
             callback: () => this.activateView(VIEW_TYPE_TASK_COLUMNS_VIEW),
         });
 
@@ -33,9 +33,9 @@ export default class TaskColumnsPlugin extends Plugin {
         // モック
         this.registerView(
             VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW,
-            (leaf) => new TaskColumnsMockView(leaf, this)
+            (leaf) => new TaskColumnsMockView(leaf, this),
         );
-        this.addRibbonIcon("monitor", "Open mock view", async () => {
+        this.addRibbonIcon('monitor', 'Open mock view', async () => {
             await this.activateView(VIEW_TYPE_TASK_COLUMNS_MOCK_VIEW);
         });
     }

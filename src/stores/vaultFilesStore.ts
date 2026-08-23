@@ -1,8 +1,8 @@
-import { create } from "zustand";
-import { App, TFile, TFolder } from "obsidian";
-import TaskColumnsPlugin from "../main";
-import TaskModel from "../models/taskModel";
-import { isUnderExcludedPath, parseExcludedFolders } from "../utils/pathUtils";
+import { create } from 'zustand';
+import { App, TFile, TFolder } from 'obsidian';
+import TaskColumnsPlugin from '../main';
+import TaskModel from '../models/taskModel';
+import { isUnderExcludedPath, parseExcludedFolders } from '../utils/pathUtils';
 
 interface VaultFilesState {
     app: App | null;
