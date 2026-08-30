@@ -7,19 +7,19 @@ export type DateRangeState = {
 
 /**
  * Ensure `target` exists in the date list, expanding the range if needed.
- * Returns the updated list, adjusted firstItemIndex, and absolute index for Virtuoso.
+ * Returns the updated list, adjusted firstItemIndex, and data-array index for Virtuoso.
  */
 export const ensureDateInRange = (
     state: DateRangeState,
     targetDate: Date,
-): DateRangeState & { absoluteIndex: number } => {
+): DateRangeState & { relativeIndex: number } => {
     const target = startOfDay(targetDate);
 
     if (state.items.length === 0) {
         return {
             items: [target],
             firstItemIndex: state.firstItemIndex,
-            absoluteIndex: state.firstItemIndex,
+            relativeIndex: 0,
         };
     }
 
@@ -29,7 +29,7 @@ export const ensureDateInRange = (
         return {
             items: [target],
             firstItemIndex: state.firstItemIndex,
-            absoluteIndex: state.firstItemIndex,
+            relativeIndex: 0,
         };
     }
 
@@ -54,7 +54,7 @@ export const ensureDateInRange = (
         return {
             items: [target],
             firstItemIndex: state.firstItemIndex,
-            absoluteIndex: state.firstItemIndex,
+            relativeIndex: 0,
         };
     }
 
@@ -62,6 +62,6 @@ export const ensureDateInRange = (
     return {
         items,
         firstItemIndex,
-        absoluteIndex: firstItemIndex + relativeIndex,
+        relativeIndex,
     };
 };
