@@ -1,15 +1,19 @@
 import { addDays, format, startOfDay } from 'date-fns';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ListRange, TableVirtuoso, VirtuosoHandle } from 'react-virtuoso';
-import HeaderRow from './HeaderRow';
-import DataRow from './DataRow';
-import DateNavigation from './DateNavigation';
+import type { DateScrollTableProps } from '../hooks/useDateScroll';
 import { isToday } from '../utils/dateDisplayUtils';
 import { ensureDateInRange } from '../utils/dateRangeUtils';
+import DataRow from './DataRow';
+import HeaderRow from './HeaderRow';
 
 const INITIAL_FIRST_ITEM_INDEX = 10000;
 
-const TaskTable = () => {
+const TaskTableScroll = ({
+    navigationTarget,
+    onReferenceDateChange,
+    onNavigationComplete,
+}: DateScrollTableProps) => {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
     const itemsRef = useRef<Date[]>([startOfDay(new Date())]);
     const firstItemIndexRef = useRef(INITIAL_FIRST_ITEM_INDEX);
@@ -20,7 +24,6 @@ const TaskTable = () => {
 
     const [items, setItems] = useState<Date[]>(() => itemsRef.current);
     const [firstItemIndex, setFirstItemIndex] = useState(INITIAL_FIRST_ITEM_INDEX);
-    const [referenceDate, setReferenceDate] = useState(() => startOfDay(new Date()));
     const [scrollTrigger, setScrollTrigger] = useState(0);
 
     const syncItems = (nextItems: Date[], nextFirstItemIndex: number) => {
@@ -36,9 +39,51 @@ const TaskTable = () => {
         if (!date) {
             return;
         }
-        const next = startOfDay(date);
-        setReferenceDate((prev) => (prev.getTime() === next.getTime() ? prev : next));
+        onReferenceDateChange(startOfDay(date));
+    }, [onReferenceDateChange]);
+
+    const scrollToDate = useCallback((targetDate: Date) => {
+        const target = startOfDay(targetDate);
+        const result = ensureDateInRange(
+            {
+                items: itemsRef.current,
+                firstItemIndex: firstItemIndexRef.current,
+            },
+            target,
+        );
+
+        isNavigatingRef.current = true;
+        pendingScrollIndexRef.current = result.relativeIndex;
+        syncItems(result.items, result.firstItemIndex);
+        setScrollTrigger((value) => value + 1);
     }, []);
+
+    useEffect(() => {
+        if (!navigationTarget) {
+            return;
+        }
+        scrollToDate(navigationTarget);
+        onNavigationComplete();
+    }, [navigationTarget, onNavigationComplete, scrollToDate]);
+
+    useEffect(() => {
+        const index = pendingScrollIndexRef.current;
+        if (index === null) {
+            return;
+        }
+
+        pendingScrollIndexRef.current = null;
+
+        window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(() => {
+                virtuosoRef.current?.scrollToIndex({
+                    index,
+                    align: 'start',
+                    behavior: 'auto',
+                });
+            });
+        });
+    }, [scrollTrigger]);
 
     const prependItems = () => {
         if (isNavigatingRef.current) {
@@ -59,42 +104,6 @@ const TaskTable = () => {
         const newItems = Array.from({ length: 20 }, (_, i) => addDays(lastDate, 1 + i));
         syncItems([...prev, ...newItems], firstItemIndexRef.current);
     };
-
-    const scrollToDate = useCallback((targetDate: Date) => {
-        const target = startOfDay(targetDate);
-        const result = ensureDateInRange(
-            {
-                items: itemsRef.current,
-                firstItemIndex: firstItemIndexRef.current,
-            },
-            target,
-        );
-
-        isNavigatingRef.current = true;
-        pendingScrollIndexRef.current = result.relativeIndex;
-        syncItems(result.items, result.firstItemIndex);
-        setReferenceDate(target);
-        setScrollTrigger((value) => value + 1);
-    }, []);
-
-    useEffect(() => {
-        const index = pendingScrollIndexRef.current;
-        if (index === null) {
-            return;
-        }
-
-        pendingScrollIndexRef.current = null;
-
-        window.requestAnimationFrame(() => {
-            window.requestAnimationFrame(() => {
-                virtuosoRef.current?.scrollToIndex({
-                    index,
-                    align: 'start',
-                    behavior: 'auto',
-                });
-            });
-        });
-    }, [scrollTrigger]);
 
     const handleRangeChanged = useCallback((range: ListRange) => {
         latestRangeRef.current = range;
@@ -121,53 +130,47 @@ const TaskTable = () => {
     }, [updateReferenceFromRange]);
 
     return (
-        <div className="task-columns-table-area">
-            <DateNavigation
-                referenceDate={referenceDate}
-                onNavigate={scrollToDate}
-            />
-            <TableVirtuoso
-                className="task-columns-table-wrapper"
-                ref={virtuosoRef}
-                data={items}
-                computeItemKey={(_index, date) => format(date, 'yyyy-MM-dd')}
-                startReached={prependItems}
-                endReached={appendItems}
-                firstItemIndex={firstItemIndex}
-                initialTopMostItemIndex={0}
-                isScrolling={handleIsScrolling}
-                rangeChanged={handleRangeChanged}
-                components={{
-                    Table: (props) => (
-                        <table
+        <TableVirtuoso
+            className="task-columns-table-wrapper"
+            ref={virtuosoRef}
+            data={items}
+            computeItemKey={(_index, date) => format(date, 'yyyy-MM-dd')}
+            startReached={prependItems}
+            endReached={appendItems}
+            firstItemIndex={firstItemIndex}
+            initialTopMostItemIndex={0}
+            isScrolling={handleIsScrolling}
+            rangeChanged={handleRangeChanged}
+            components={{
+                Table: (props) => (
+                    <table
+                        {...props}
+                        className="task-columns-table"
+                    />
+                ),
+                TableRow: ({ item, context: _context, ...props }) => {
+                    const index = Number(props['data-index']);
+                    const parityClass =
+                        index % 2 === 0 ? 'task-columns-row-even' : 'task-columns-row-odd';
+                    const todayClass = isToday(item) ? 'task-columns-row-today' : '';
+                    return (
+                        <tr
                             {...props}
-                            className="task-columns-table"
+                            className={[parityClass, todayClass].filter(Boolean).join(' ')}
                         />
-                    ),
-                    TableRow: ({ item, context: _context, ...props }) => {
-                        const index = Number(props['data-index']);
-                        const parityClass =
-                            index % 2 === 0 ? 'task-columns-row-even' : 'task-columns-row-odd';
-                        const todayClass = isToday(item) ? 'task-columns-row-today' : '';
-                        return (
-                            <tr
-                                {...props}
-                                className={[parityClass, todayClass].filter(Boolean).join(' ')}
-                            />
-                        );
-                    },
-                    TableFoot: (props) => <tfoot {...props} />,
-                }}
-                fixedHeaderContent={HeaderRow}
-                itemContent={(_index, item) => <DataRow date={item} />}
-                fixedFooterContent={() => (
-                    <tr className="task-columns-footer-row">
-                        <DataRow date={null} />
-                    </tr>
-                )}
-            />
-        </div>
+                    );
+                },
+                TableFoot: (props) => <tfoot {...props} />,
+            }}
+            fixedHeaderContent={HeaderRow}
+            itemContent={(_index, item) => <DataRow date={item} />}
+            fixedFooterContent={() => (
+                <tr className="task-columns-footer-row">
+                    <DataRow date={null} />
+                </tr>
+            )}
+        />
     );
 };
 
-export default TaskTable;
+export default TaskTableScroll;
