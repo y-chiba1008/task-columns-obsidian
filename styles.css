@@ -18,15 +18,83 @@
   --task-columns-category-min-width: 10em;
   --task-columns-inline-gap: 0.35em;
 
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  overflow: auto;
+  overflow: hidden;
   background-color: var(--background-primary);
   color: var(--text-normal);
 }
 
+.task-columns-table-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .task-columns-table-wrapper {
+  flex: 1;
+  min-height: 0;
   overflow: auto;
-  height: 100%;
+}
+
+/* --- 日付移動 --- */
+
+.task-columns-date-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-4-2, 8px);
+  flex-shrink: 0;
+  padding: var(--size-4-2, 8px) var(--size-4-3, 12px);
+  border-bottom: 1px solid var(--background-modifier-border);
+  background-color: var(--background-secondary);
+}
+
+.task-columns-date-nav-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-4-1, 4px);
+}
+
+.task-columns-date-nav-button {
+  font: inherit;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--button-radius, 4px);
+  padding: 0.3em 0.7em;
+  cursor: pointer;
+}
+
+.task-columns-date-nav-button:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.task-columns-date-nav-date-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--task-columns-inline-gap);
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.task-columns-date-nav-date-caption {
+  white-space: nowrap;
+}
+
+.task-columns-date-nav-date-input {
+  font: inherit;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--input-radius, 4px);
+  padding: 0.25em 0.4em;
 }
 
 .task-columns-table {
