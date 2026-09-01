@@ -1,4 +1,3 @@
-import { App, TFile } from 'obsidian';
 import { generateCellKey } from '../utils/keyUtils';
 
 class TaskModel {
@@ -8,18 +7,6 @@ class TaskModel {
         public readonly folder: string,
         public readonly title: string,
     ) { }
-
-    public static fromFile(file: TFile, app: App): TaskModel {
-        const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
-        const datetime = (frontmatter?.datetime && typeof(frontmatter.datetime) === 'string')
-                            ? new Date(frontmatter.datetime) : null;
-        return new TaskModel(
-            file.path,
-            datetime,
-            file.parent?.name ?? '',
-            file.basename,
-        );
-    }
 
     public get cellKey(): string {
         return generateCellKey(this.datetime, this.folder);

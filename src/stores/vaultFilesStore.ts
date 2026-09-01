@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { App, TFile, TFolder } from 'obsidian';
 import TaskColumnsPlugin from '../main';
 import TaskModel from '../models/taskModel';
-import { isUnderExcludedPath, parseExcludedFolders } from '../utils/pathUtils';
+import { VaultRepository } from '../repositories/vaultRepository';
 
 interface VaultFilesState {
     app: App | null;
@@ -12,50 +12,38 @@ interface VaultFilesState {
     update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => void;
 }
 
+function groupTasksByCellKey(tasks: TaskModel[]): Map<string, TaskModel[]> {
+    const groups = new Map<string, TaskModel[]>();
+    for (const task of tasks) {
+        const list = groups.get(task.cellKey) ?? [];
+        list.push(task);
+        groups.set(task.cellKey, list);
+    }
+    for (const [key, list] of groups) {
+        groups.set(key, TaskModel.sortTasks(list));
+    }
+    return groups;
+}
+
 export const useVaultFilesStore = create<VaultFilesState>((set) => ({
     app: null,
     fileGroups: new Map<string, TaskModel[]>(),
     folders: [],
     refresh: (app: App, plugin: TaskColumnsPlugin) => {
-        const targetFolder = plugin.settings.targetFolder;
-        const excludedFolders = parseExcludedFolders(plugin.settings.excludedFolders);
-
-        // ファイルを日付・フォルダごとにグループ化
-        const fileGroups = new Map<string, TaskModel[]>();
-        app.vault
-            .getMarkdownFiles()
-            .filter((file) => file.path.startsWith(targetFolder + '/'))
-            .filter((file) => !isUnderExcludedPath(file.path, excludedFolders))
-            .map((file) => TaskModel.fromFile(file, app))
-            .forEach((taskModel) => {
-                if (!fileGroups.has(taskModel.cellKey)) {
-                    fileGroups.set(taskModel.cellKey, []);
-                }
-                fileGroups.get(taskModel.cellKey)?.push(taskModel);
-            });
-        for (const [cellKey, tasks] of fileGroups) {
-            fileGroups.set(cellKey, TaskModel.sortTasks(tasks));
-        }
-
-        // フォルダーを取得
-        const folders = app.vault
-            .getAllFolders()
-            .filter((folder) => folder.path.startsWith(targetFolder + '/'))
-            .filter((folder) => !isUnderExcludedPath(folder.path, excludedFolders));
-
-        // ステートを更新
-        set({ app, fileGroups: fileGroups, folders: folders });
+        const repo = new VaultRepository(app, plugin.settings);
+        const fileGroups = groupTasksByCellKey(repo.listTasks());
+        const folders = repo.listFolders();
+        set({ app, fileGroups, folders });
     },
 
     update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => {
-        const targetFolder = plugin.settings.targetFolder;
-        if (!file.path.startsWith(targetFolder + '/')) {
+        const repo = new VaultRepository(app, plugin.settings);
+        if (!repo.isUnderTargetFolder(file.path)) {
             return;
         }
 
-        const excludedFolders = parseExcludedFolders(plugin.settings.excludedFolders);
-        const isExcluded = isUnderExcludedPath(file.path, excludedFolders);
-        const taskModel = TaskModel.fromFile(file, app);
+        const taskModel = repo.parseTask(file);
+        const isExcluded = repo.isExcluded(file.path);
         set((state) => {
             const nextFileGroups = new Map(state.fileGroups);
 
