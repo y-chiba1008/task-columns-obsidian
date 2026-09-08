@@ -79,7 +79,7 @@ export class TaskColumnsView extends ItemView {
 
         const timer = window.setTimeout(() => {
             this.metadataUpdateTimers.delete(file.path);
-            useVaultFilesStore.getState().update(file, this.app, this.plugin);
+            useVaultFilesStore.getState().update(file.path, this.app, this.plugin);
         }, METADATA_UPDATE_DEBOUNCE_MS);
         this.metadataUpdateTimers.set(file.path, timer);
     }

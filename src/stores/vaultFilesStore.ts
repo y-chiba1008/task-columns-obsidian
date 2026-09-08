@@ -1,15 +1,16 @@
 import { create } from 'zustand';
-import { App, TFile, TFolder } from 'obsidian';
+import { App } from 'obsidian';
 import TaskColumnsPlugin from '../main';
+import FolderModel from '../models/folderModel';
 import TaskModel from '../models/taskModel';
 import { VaultRepository } from '../repositories/vaultRepository';
 
 interface VaultFilesState {
     app: App | null;
     fileGroups: Map<string, TaskModel[]>;
-    folders: TFolder[];
+    folders: FolderModel[];
     refresh: (app: App, plugin: TaskColumnsPlugin) => void;
-    update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => void;
+    update: (path: string, app: App, plugin: TaskColumnsPlugin) => void;
 }
 
 function groupTasksByCellKey(tasks: TaskModel[]): Map<string, TaskModel[]> {
@@ -36,14 +37,18 @@ export const useVaultFilesStore = create<VaultFilesState>((set) => ({
         set({ app, fileGroups, folders });
     },
 
-    update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => {
+    update: (path: string, app: App, plugin: TaskColumnsPlugin) => {
         const repo = new VaultRepository(app, plugin.settings);
-        if (!repo.isUnderTargetFolder(file.path)) {
+        if (!repo.isUnderTargetFolder(path)) {
             return;
         }
 
-        const taskModel = repo.parseTask(file);
-        const isExcluded = repo.isExcluded(file.path);
+        const taskModel = repo.parseTaskByPath(path);
+        if (!taskModel) {
+            return;
+        }
+
+        const isExcluded = repo.isExcluded(path);
         set((state) => {
             const nextFileGroups = new Map(state.fileGroups);
 
