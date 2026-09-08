@@ -83,7 +83,9 @@ export class TaskColumnsView extends ItemView {
         if (!this.repo) {
             return;
         }
-        useVaultFilesStore.getState().refresh(this.repo);
+        const tasks = this.repo.listTasks();
+        const folders = this.repo.listFolders();
+        useVaultFilesStore.getState().replaceAll(tasks, folders);
     }
 
     private scheduleMetadataUpdate(file: TFile) {
@@ -97,7 +99,24 @@ export class TaskColumnsView extends ItemView {
             if (!this.repo) {
                 return;
             }
-            useVaultFilesStore.getState().update(file.path, this.repo);
+
+            const path = file.path;
+            if (!this.repo.isUnderTargetFolder(path)) {
+                return;
+            }
+
+            if (this.repo.isExcluded(path)) {
+                useVaultFilesStore.getState().removeByPath(path);
+                return;
+            }
+
+            const task = this.repo.parseTaskByPath(path);
+            if (!task) {
+                useVaultFilesStore.getState().removeByPath(path);
+                return;
+            }
+
+            useVaultFilesStore.getState().upsertTask(task);
         }, METADATA_UPDATE_DEBOUNCE_MS);
         this.metadataUpdateTimers.set(file.path, timer);
     }
