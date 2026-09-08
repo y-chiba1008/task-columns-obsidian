@@ -2,8 +2,9 @@ import { ItemView, TFile, WorkspaceLeaf } from 'obsidian';
 import { StrictMode } from 'react';
 import { Root, createRoot } from 'react-dom/client';
 import ViewRoot from './components/ViewRoot';
-import { AppProvider } from './context/AppContext';
+import { WorkspaceServiceProvider } from './context/WorkspaceServiceContext';
 import { VaultRepository } from './repositories/vaultRepository';
+import { WorkspaceService } from './services/workspaceService';
 import { useVaultFilesStore } from './stores/vaultFilesStore';
 import TaskColumnsPlugin from './main';
 
@@ -15,6 +16,7 @@ export class TaskColumnsView extends ItemView {
     private root: Root | null = null;
     private plugin: TaskColumnsPlugin;
     private repo: VaultRepository | null = null;
+    private workspaceService: WorkspaceService | null = null;
     private metadataUpdateTimers = new Map<string, number>();
 
     constructor(leaf: WorkspaceLeaf, plugin: TaskColumnsPlugin) {
@@ -40,6 +42,7 @@ export class TaskColumnsView extends ItemView {
         this.root = createRoot(container);
 
         this.repo = new VaultRepository(this.app, () => this.plugin.settings);
+        this.workspaceService = new WorkspaceService(this.app);
 
         // ファイル一覧を取得
         this.refreshFiles();
@@ -63,9 +66,9 @@ export class TaskColumnsView extends ItemView {
 
         this.root.render(
             <StrictMode>
-                <AppProvider app={this.app}>
+                <WorkspaceServiceProvider service={this.workspaceService}>
                     <ViewRoot />
-                </AppProvider>
+                </WorkspaceServiceProvider>
             </StrictMode>,
         );
     }
@@ -76,6 +79,7 @@ export class TaskColumnsView extends ItemView {
         }
         this.metadataUpdateTimers.clear();
         this.repo = null;
+        this.workspaceService = null;
         this.root?.unmount();
     }
 

@@ -1,14 +1,13 @@
 import { useCallback } from 'react';
-import { useApp } from '../context/AppContext';
-import { openTaskFile } from '../utils/openTaskFile';
+import { useWorkspaceService } from '../context/WorkspaceServiceContext';
 
 export function useOpenTask(): (path: string) => void {
-    const app = useApp();
+    const workspace = useWorkspaceService();
 
     return useCallback(
         (path: string) => {
-            void openTaskFile(app, path);
+            void workspace.openTask(path);
         },
-        [app],
+        [workspace],
     );
 }
