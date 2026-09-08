@@ -17,7 +17,7 @@ export type UseDateScrollResult = {
     table: DateScrollTableProps;
 };
 
-export function useDateScroll(): UseDateScrollResult {
+export const useDateScroll = (): UseDateScrollResult => {
     const [referenceDate, setReferenceDate] = useState(() => startOfDay(new Date()));
     const [navigationTarget, setNavigationTarget] = useState<Date | null>(null);
 
@@ -47,4 +47,4 @@ export function useDateScroll(): UseDateScrollResult {
             onNavigationComplete: acknowledgeNavigation,
         },
     };
-}
+};

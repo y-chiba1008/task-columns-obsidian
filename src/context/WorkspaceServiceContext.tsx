@@ -3,24 +3,24 @@ import { WorkspaceService } from '../services/workspaceService';
 
 const WorkspaceServiceContext = createContext<WorkspaceService | null>(null);
 
-export function WorkspaceServiceProvider({
+export const WorkspaceServiceProvider = ({
     service,
     children,
 }: {
     service: WorkspaceService;
     children: ReactNode;
-}) {
+}) => {
     return (
         <WorkspaceServiceContext.Provider value={service}>
             {children}
         </WorkspaceServiceContext.Provider>
     );
-}
+};
 
-export function useWorkspaceService(): WorkspaceService {
+export const useWorkspaceService = (): WorkspaceService => {
     const service = useContext(WorkspaceServiceContext);
     if (!service) {
         throw new Error('useWorkspaceService must be used within WorkspaceServiceProvider');
     }
     return service;
-}
+};

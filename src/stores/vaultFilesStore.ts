@@ -10,7 +10,7 @@ interface VaultFilesState {
     upsertNote: (note: NoteModel) => void;
 }
 
-function groupNotesByGroupKey(notes: NoteModel[]): Map<string, NoteModel[]> {
+const groupNotesByGroupKey = (notes: NoteModel[]): Map<string, NoteModel[]> => {
     const groups = new Map<string, NoteModel[]>();
     for (const note of notes) {
         const list = groups.get(note.groupKey) ?? [];
@@ -21,12 +21,12 @@ function groupNotesByGroupKey(notes: NoteModel[]): Map<string, NoteModel[]> {
         groups.set(key, NoteModel.sortNotes(list));
     }
     return groups;
-}
+};
 
-function removeNoteByPath(
+const removeNoteByPath = (
     noteGroups: Map<string, NoteModel[]>,
     path: string,
-): Map<string, NoteModel[]> {
+): Map<string, NoteModel[]> => {
     const nextNoteGroups = new Map(noteGroups);
 
     for (const [groupKey, notes] of nextNoteGroups) {
@@ -42,7 +42,7 @@ function removeNoteByPath(
     }
 
     return nextNoteGroups;
-}
+};
 
 export const useVaultFilesStore = create<VaultFilesState>((set) => ({
     noteGroups: new Map<string, NoteModel[]>(),
