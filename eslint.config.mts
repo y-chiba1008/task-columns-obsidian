@@ -37,6 +37,7 @@ export default defineConfig(
             'semi': ['error', 'always'],
             'comma-dangle': ['error', 'always-multiline'],
             'quotes': ['error', 'single'],
+            'prefer-arrow-callback': 'error',
         },
     },
 );
