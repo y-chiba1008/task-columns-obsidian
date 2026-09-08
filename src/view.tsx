@@ -2,6 +2,9 @@ import { ItemView, TFile, WorkspaceLeaf } from 'obsidian';
 import { StrictMode } from 'react';
 import { Root, createRoot } from 'react-dom/client';
 import ViewRoot from './components/ViewRoot';
+import { WorkspaceServiceProvider } from './context/WorkspaceServiceContext';
+import { VaultRepository } from './repositories/vaultRepository';
+import { WorkspaceService } from './services/workspaceService';
 import { useVaultFilesStore } from './stores/vaultFilesStore';
 import TaskColumnsPlugin from './main';
 
@@ -12,6 +15,8 @@ const METADATA_UPDATE_DEBOUNCE_MS = 200;
 export class TaskColumnsView extends ItemView {
     private root: Root | null = null;
     private plugin: TaskColumnsPlugin;
+    private repo: VaultRepository | null = null;
+    private workspaceService: WorkspaceService | null = null;
     private metadataUpdateTimers = new Map<string, number>();
 
     constructor(leaf: WorkspaceLeaf, plugin: TaskColumnsPlugin) {
@@ -36,29 +41,34 @@ export class TaskColumnsView extends ItemView {
         if (!container) return;
         this.root = createRoot(container);
 
+        this.repo = new VaultRepository(this.app, () => this.plugin.settings);
+        this.workspaceService = new WorkspaceService(this.app);
+
         // ファイル一覧を取得
-        useVaultFilesStore.getState().refresh(this.app, this.plugin);
+        this.refreshFiles();
 
         // ファイルと設定の変更イベント監視 → storeを更新
         this.registerEvent(
             this.app.metadataCache.on('changed', (file) => this.scheduleMetadataUpdate(file)),
         );
         this.registerEvent(
-            this.app.vault.on('rename', () => useVaultFilesStore.getState().refresh(this.app, this.plugin)),
+            this.app.vault.on('rename', () => this.refreshFiles()),
         );
         this.registerEvent(
-            this.app.vault.on('create', () => useVaultFilesStore.getState().refresh(this.app, this.plugin)),
+            this.app.vault.on('create', () => this.refreshFiles()),
         );
         this.registerEvent(
-            this.app.vault.on('delete', () => useVaultFilesStore.getState().refresh(this.app, this.plugin)),
+            this.app.vault.on('delete', () => this.refreshFiles()),
         );
         this.registerEvent(
-            this.plugin.settingsEvents.on('changed', () => useVaultFilesStore.getState().refresh(this.app, this.plugin)),
+            this.plugin.settingsEvents.on('changed', () => this.refreshFiles()),
         );
 
         this.root.render(
             <StrictMode>
-                <ViewRoot />
+                <WorkspaceServiceProvider service={this.workspaceService}>
+                    <ViewRoot />
+                </WorkspaceServiceProvider>
             </StrictMode>,
         );
     }
@@ -68,7 +78,18 @@ export class TaskColumnsView extends ItemView {
             window.clearTimeout(timer);
         }
         this.metadataUpdateTimers.clear();
+        this.repo = null;
+        this.workspaceService = null;
         this.root?.unmount();
+    }
+
+    private refreshFiles() {
+        if (!this.repo) {
+            return;
+        }
+        const tasks = this.repo.listTasks();
+        const folders = this.repo.listFolders();
+        useVaultFilesStore.getState().replaceAll(tasks, folders);
     }
 
     private scheduleMetadataUpdate(file: TFile) {
@@ -79,7 +100,27 @@ export class TaskColumnsView extends ItemView {
 
         const timer = window.setTimeout(() => {
             this.metadataUpdateTimers.delete(file.path);
-            useVaultFilesStore.getState().update(file, this.app, this.plugin);
+            if (!this.repo) {
+                return;
+            }
+
+            const path = file.path;
+            if (!this.repo.isUnderTargetFolder(path)) {
+                return;
+            }
+
+            if (this.repo.isExcluded(path)) {
+                useVaultFilesStore.getState().removeByPath(path);
+                return;
+            }
+
+            const task = this.repo.parseTaskByPath(path);
+            if (!task) {
+                useVaultFilesStore.getState().removeByPath(path);
+                return;
+            }
+
+            useVaultFilesStore.getState().upsertTask(task);
         }, METADATA_UPDATE_DEBOUNCE_MS);
         this.metadataUpdateTimers.set(file.path, timer);
     }

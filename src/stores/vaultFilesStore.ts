@@ -1,15 +1,13 @@
 import { create } from 'zustand';
-import { App, TFile, TFolder } from 'obsidian';
-import TaskColumnsPlugin from '../main';
+import FolderModel from '../models/folderModel';
 import TaskModel from '../models/taskModel';
-import { VaultRepository } from '../repositories/vaultRepository';
 
 interface VaultFilesState {
-    app: App | null;
     fileGroups: Map<string, TaskModel[]>;
-    folders: TFolder[];
-    refresh: (app: App, plugin: TaskColumnsPlugin) => void;
-    update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => void;
+    folders: FolderModel[];
+    replaceAll: (tasks: TaskModel[], folders: FolderModel[]) => void;
+    removeByPath: (path: string) => void;
+    upsertTask: (task: TaskModel) => void;
 }
 
 function groupTasksByCellKey(tasks: TaskModel[]): Map<string, TaskModel[]> {
@@ -25,44 +23,48 @@ function groupTasksByCellKey(tasks: TaskModel[]): Map<string, TaskModel[]> {
     return groups;
 }
 
+function removeTaskByPath(
+    fileGroups: Map<string, TaskModel[]>,
+    path: string,
+): Map<string, TaskModel[]> {
+    const nextFileGroups = new Map(fileGroups);
+
+    for (const [cellKey, tasks] of nextFileGroups) {
+        const filtered = tasks.filter((task) => task.path !== path);
+        if (filtered.length === tasks.length) {
+            continue;
+        }
+        if (filtered.length === 0) {
+            nextFileGroups.delete(cellKey);
+        } else {
+            nextFileGroups.set(cellKey, filtered);
+        }
+    }
+
+    return nextFileGroups;
+}
+
 export const useVaultFilesStore = create<VaultFilesState>((set) => ({
-    app: null,
     fileGroups: new Map<string, TaskModel[]>(),
     folders: [],
-    refresh: (app: App, plugin: TaskColumnsPlugin) => {
-        const repo = new VaultRepository(app, plugin.settings);
-        const fileGroups = groupTasksByCellKey(repo.listTasks());
-        const folders = repo.listFolders();
-        set({ app, fileGroups, folders });
+    replaceAll: (tasks, folders) => {
+        set({
+            fileGroups: groupTasksByCellKey(tasks),
+            folders,
+        });
     },
 
-    update: (file: TFile, app: App, plugin: TaskColumnsPlugin) => {
-        const repo = new VaultRepository(app, plugin.settings);
-        if (!repo.isUnderTargetFolder(file.path)) {
-            return;
-        }
+    removeByPath: (path) => {
+        set((state) => ({
+            fileGroups: removeTaskByPath(state.fileGroups, path),
+        }));
+    },
 
-        const taskModel = repo.parseTask(file);
-        const isExcluded = repo.isExcluded(file.path);
+    upsertTask: (task) => {
         set((state) => {
-            const nextFileGroups = new Map(state.fileGroups);
-
-            for (const [cellKey, tasks] of nextFileGroups) {
-                const filtered = tasks.filter((task) => task.path !== taskModel.path);
-                if (filtered.length === tasks.length) {
-                    continue;
-                }
-                if (filtered.length === 0) {
-                    nextFileGroups.delete(cellKey);
-                } else {
-                    nextFileGroups.set(cellKey, filtered);
-                }
-            }
-
-            if (!isExcluded) {
-                const prevTasks = nextFileGroups.get(taskModel.cellKey) ?? [];
-                nextFileGroups.set(taskModel.cellKey, TaskModel.sortTasks([...prevTasks, taskModel]));
-            }
+            const nextFileGroups = removeTaskByPath(state.fileGroups, task.path);
+            const prevTasks = nextFileGroups.get(task.cellKey) ?? [];
+            nextFileGroups.set(task.cellKey, TaskModel.sortTasks([...prevTasks, task]));
             return { fileGroups: nextFileGroups };
         });
     },
