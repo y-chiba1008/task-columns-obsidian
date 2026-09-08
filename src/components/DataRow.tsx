@@ -1,6 +1,6 @@
 import { useVaultFilesStore } from '../stores/vaultFilesStore';
-import TaskCell from './TaskCell';
-import { generateCellKey } from '../utils/keyUtils';
+import Cell from './Cell';
+import { generateGroupKey } from '../utils/keyUtils';
 import {
     dateToneClassName,
     formatDateLabel,
@@ -13,8 +13,8 @@ const DataRow = ({ date }: { date: Date | null }) => {
     const toneClass = date ? dateToneClassName(getDateColorTone(date)) : '';
     const label = date ? formatDateLabel(date) : null;
     const dateCellClass = [
-        'task-columns-cell',
-        'task-columns-date-cell',
+        'dated-notes-table-cell',
+        'dated-notes-table-date-cell',
         toneClass,
     ]
         .filter(Boolean)
@@ -25,9 +25,9 @@ const DataRow = ({ date }: { date: Date | null }) => {
             <th className={dateCellClass}>
                 {label ? (
                     <>
-                        <div className="task-columns-date-text">{label.dateText}</div>
+                        <div className="dated-notes-table-date-text">{label.dateText}</div>
                         {label.holidayName && (
-                            <div className="task-columns-holiday-name">{label.holidayName}</div>
+                            <div className="dated-notes-table-holiday-name">{label.holidayName}</div>
                         )}
                     </>
                 ) : (
@@ -35,10 +35,10 @@ const DataRow = ({ date }: { date: Date | null }) => {
                 )}
             </th>
             {folders.map((folder) => (
-                <TaskCell
+                <Cell
                     date={date}
                     folder={folder.name}
-                    key={generateCellKey(date, folder.name)}
+                    key={generateGroupKey(date, folder.name)}
                 />
             ))}
         </>

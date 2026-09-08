@@ -29,9 +29,9 @@ export const formatDateLabel = (date: Date): { dateText: string; holidayName: st
 export const dateToneClassName = (tone: DateColorTone): string => {
     switch (tone) {
         case 'saturday':
-            return 'task-columns-date-saturday';
+            return 'dated-notes-table-date-saturday';
         case 'sunday-or-holiday':
-            return 'task-columns-date-sunday-or-holiday';
+            return 'dated-notes-table-date-sunday-or-holiday';
         default:
             return '';
     }

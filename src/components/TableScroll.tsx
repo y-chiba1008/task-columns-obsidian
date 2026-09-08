@@ -9,7 +9,7 @@ import HeaderRow from './HeaderRow';
 
 const INITIAL_FIRST_ITEM_INDEX = 10000;
 
-const TaskTableScroll = ({
+const TableScroll = ({
     navigationTarget,
     onReferenceDateChange,
     onNavigationComplete,
@@ -131,7 +131,7 @@ const TaskTableScroll = ({
 
     return (
         <TableVirtuoso
-            className="task-columns-table-wrapper"
+            className="dated-notes-table-table-wrapper"
             ref={virtuosoRef}
             data={items}
             computeItemKey={(_index, date) => format(date, 'yyyy-MM-dd')}
@@ -145,14 +145,14 @@ const TaskTableScroll = ({
                 Table: (props) => (
                     <table
                         {...props}
-                        className="task-columns-table"
+                        className="dated-notes-table-table"
                     />
                 ),
                 TableRow: ({ item, context: _context, ...props }) => {
                     const index = Number(props['data-index']);
                     const parityClass =
-                        index % 2 === 0 ? 'task-columns-row-even' : 'task-columns-row-odd';
-                    const todayClass = isToday(item) ? 'task-columns-row-today' : '';
+                        index % 2 === 0 ? 'dated-notes-table-row-even' : 'dated-notes-table-row-odd';
+                    const todayClass = isToday(item) ? 'dated-notes-table-row-today' : '';
                     return (
                         <tr
                             {...props}
@@ -165,7 +165,7 @@ const TaskTableScroll = ({
             fixedHeaderContent={HeaderRow}
             itemContent={(_index, item) => <DataRow date={item} />}
             fixedFooterContent={() => (
-                <tr className="task-columns-footer-row">
+                <tr className="dated-notes-table-footer-row">
                     <DataRow date={null} />
                 </tr>
             )}
@@ -173,4 +173,4 @@ const TaskTableScroll = ({
     );
 };
 
-export default TaskTableScroll;
+export default TableScroll;

@@ -1,21 +1,21 @@
 import { App, TFile, TFolder } from 'obsidian';
 import FolderModel from '../models/folderModel';
-import TaskModel from '../models/taskModel';
-import { TaskColumnsSettings } from '../settings';
+import NoteModel from '../models/noteModel';
+import { DatedNotesTableSettings } from '../settings';
 import { isUnderExcludedPath, parseExcludedFolders } from '../utils/pathUtils';
 
 export class VaultRepository {
     constructor(
         private readonly app: App,
-        private readonly getSettings: () => TaskColumnsSettings,
+        private readonly getSettings: () => DatedNotesTableSettings,
     ) {}
 
-    listTasks(): TaskModel[] {
+    listNotes(): NoteModel[] {
         return this.app.vault
             .getMarkdownFiles()
             .filter((file) => this.isUnderTargetFolder(file.path))
             .filter((file) => !this.isExcluded(file.path))
-            .map((file) => this.parseTask(file));
+            .map((file) => this.parseNote(file));
     }
 
     listFolders(): FolderModel[] {
@@ -26,12 +26,12 @@ export class VaultRepository {
             .map((folder) => this.toFolderModel(folder));
     }
 
-    parseTaskByPath(path: string): TaskModel | null {
+    parseNoteByPath(path: string): NoteModel | null {
         const file = this.app.vault.getAbstractFileByPath(path);
         if (!(file instanceof TFile)) {
             return null;
         }
-        return this.parseTask(file);
+        return this.parseNote(file);
     }
 
     isUnderTargetFolder(path: string): boolean {
@@ -42,12 +42,12 @@ export class VaultRepository {
         return isUnderExcludedPath(path, this.getExcludedFolders());
     }
 
-    private parseTask(file: TFile): TaskModel {
+    private parseNote(file: TFile): NoteModel {
         const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
         const datetime = (frontmatter?.datetime && typeof frontmatter.datetime === 'string')
             ? new Date(frontmatter.datetime)
             : null;
-        return new TaskModel(
+        return new NoteModel(
             file.path,
             datetime,
             file.parent?.name ?? '',
@@ -63,5 +63,5 @@ export class VaultRepository {
         return parseExcludedFolders(this.getSettings().excludedFolders);
     }
 
-    // Future: createTask, updateTask, deleteTask, etc.
+    // Future: createNote, updateNote, deleteNote, etc.
 }

@@ -3,7 +3,7 @@ import { App, MarkdownView, TFile, WorkspaceLeaf } from 'obsidian';
 export class WorkspaceService {
     constructor(private readonly app: App) {}
 
-    async openTask(path: string): Promise<void> {
+    async openNote(path: string): Promise<void> {
         const file = this.app.vault.getAbstractFileByPath(path);
         if (!(file instanceof TFile)) {
             return;

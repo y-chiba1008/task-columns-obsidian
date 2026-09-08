@@ -1,33 +1,33 @@
 import { Events, Plugin, WorkspaceLeaf } from 'obsidian';
-import { TaskColumnsView, VIEW_TYPE_TASK_COLUMNS_VIEW } from './view';
+import { DatedNotesTableView, VIEW_TYPE_DATED_NOTES_TABLE_VIEW } from './view';
 import {
     DEFAULT_SETTINGS,
-    TaskColumnsSettings,
-    TaskColumnsSettingTab,
+    DatedNotesTableSettings,
+    DatedNotesTableSettingTab,
 } from './settings';
 
-export default class TaskColumnsPlugin extends Plugin {
-    settings!: TaskColumnsSettings;
+export default class DatedNotesTablePlugin extends Plugin {
+    settings!: DatedNotesTableSettings;
     settingsEvents = new Events();
 
     async onload() {
         await this.loadSettings();
         this.registerView(
-            VIEW_TYPE_TASK_COLUMNS_VIEW,
-            (leaf) => new TaskColumnsView(leaf, this),
+            VIEW_TYPE_DATED_NOTES_TABLE_VIEW,
+            (leaf) => new DatedNotesTableView(leaf, this),
         );
 
-        this.addRibbonIcon('dice', 'Open my view', async () => {
-            await this.activateView(VIEW_TYPE_TASK_COLUMNS_VIEW);
+        this.addRibbonIcon('dice', 'Open view', async () => {
+            await this.activateView(VIEW_TYPE_DATED_NOTES_TABLE_VIEW);
         });
 
         this.addCommand({
-            id: 'open-tasks-view',
-            name: 'Open tasks view',
-            callback: () => this.activateView(VIEW_TYPE_TASK_COLUMNS_VIEW),
+            id: 'open-view',
+            name: 'Open view',
+            callback: () => this.activateView(VIEW_TYPE_DATED_NOTES_TABLE_VIEW),
         });
 
-        this.addSettingTab(new TaskColumnsSettingTab(this.app, this));
+        this.addSettingTab(new DatedNotesTableSettingTab(this.app, this));
     }
 
     onunload() {
@@ -55,7 +55,7 @@ export default class TaskColumnsPlugin extends Plugin {
         this.settings = Object.assign(
             {},
             DEFAULT_SETTINGS,
-            (await this.loadData()) as Partial<TaskColumnsSettings>,
+            (await this.loadData()) as Partial<DatedNotesTableSettings>,
         );
     }
 

@@ -1,15 +1,15 @@
 import { useDateScroll } from '../hooks/useDateScroll';
 import DateNavigation from './DateNavigation';
-import TaskTableScroll from './TaskTableScroll';
+import TableScroll from './TableScroll';
 
 const ViewRoot = () => {
     const { navigation, table } = useDateScroll();
 
     return (
-        <div className="task-columns-view">
-            <div className="task-columns-table-area">
+        <div className="dated-notes-table-view">
+            <div className="dated-notes-table-table-area">
                 <DateNavigation {...navigation} />
-                <TaskTableScroll {...table} />
+                <TableScroll {...table} />
             </div>
         </div>
     );

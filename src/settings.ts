@@ -1,21 +1,21 @@
 import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
-import TaskColumnsPlugin from './main';
+import DatedNotesTablePlugin from './main';
 import { FolderSuggest } from './ui/folderSuggest';
 
-export interface TaskColumnsSettings {
+export interface DatedNotesTableSettings {
     targetFolder: string;
     excludedFolders: string;
 }
 
-export const DEFAULT_SETTINGS: TaskColumnsSettings = {
+export const DEFAULT_SETTINGS: DatedNotesTableSettings = {
     targetFolder: '',
     excludedFolders: '',
 };
 
-export class TaskColumnsSettingTab extends PluginSettingTab {
-    plugin: TaskColumnsPlugin;
+export class DatedNotesTableSettingTab extends PluginSettingTab {
+    plugin: DatedNotesTablePlugin;
 
-    constructor(app: App, plugin: TaskColumnsPlugin) {
+    constructor(app: App, plugin: DatedNotesTablePlugin) {
         super(app, plugin);
         this.plugin = plugin;
     }
