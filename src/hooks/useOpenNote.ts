@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { useWorkspaceService } from '../context/WorkspaceServiceContext';
 
-export function useOpenTask(): (path: string) => void {
+export function useOpenNote(): (path: string) => void {
     const workspace = useWorkspaceService();
 
     return useCallback(
         (path: string) => {
-            void workspace.openTask(path);
+            void workspace.openNote(path);
         },
         [workspace],
     );

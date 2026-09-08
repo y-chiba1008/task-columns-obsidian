@@ -1,9 +1,9 @@
 {
-    "id": "task-columns",
-    "name": "Task Columns",
+    "id": "dated-notes-table",
+    "name": "Dated Notes Table",
     "version": "1.0.0",
     "minAppVersion": "1.12.7",
-    "description": "",
+    "description": "Browse notes in a date × folder table.",
     "author": "y-chiba",
     "authorUrl": "",
     "fundingUrl": "",

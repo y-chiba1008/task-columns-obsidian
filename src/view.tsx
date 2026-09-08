@@ -6,30 +6,30 @@ import { WorkspaceServiceProvider } from './context/WorkspaceServiceContext';
 import { VaultRepository } from './repositories/vaultRepository';
 import { WorkspaceService } from './services/workspaceService';
 import { useVaultFilesStore } from './stores/vaultFilesStore';
-import TaskColumnsPlugin from './main';
+import DatedNotesTablePlugin from './main';
 
-export const VIEW_TYPE_TASK_COLUMNS_VIEW = 'task-columns-view';
+export const VIEW_TYPE_DATED_NOTES_TABLE_VIEW = 'dated-notes-table-view';
 
 const METADATA_UPDATE_DEBOUNCE_MS = 200;
 
-export class TaskColumnsView extends ItemView {
+export class DatedNotesTableView extends ItemView {
     private root: Root | null = null;
-    private plugin: TaskColumnsPlugin;
+    private plugin: DatedNotesTablePlugin;
     private repo: VaultRepository | null = null;
     private workspaceService: WorkspaceService | null = null;
     private metadataUpdateTimers = new Map<string, number>();
 
-    constructor(leaf: WorkspaceLeaf, plugin: TaskColumnsPlugin) {
+    constructor(leaf: WorkspaceLeaf, plugin: DatedNotesTablePlugin) {
         super(leaf);
         this.plugin = plugin;
     }
 
     getViewType(): string {
-        return VIEW_TYPE_TASK_COLUMNS_VIEW;
+        return VIEW_TYPE_DATED_NOTES_TABLE_VIEW;
     }
 
     getDisplayText(): string {
-        return 'Task columns view';
+        return 'Dated notes table';
     }
 
     getIcon(): string {
@@ -87,9 +87,9 @@ export class TaskColumnsView extends ItemView {
         if (!this.repo) {
             return;
         }
-        const tasks = this.repo.listTasks();
+        const notes = this.repo.listNotes();
         const folders = this.repo.listFolders();
-        useVaultFilesStore.getState().replaceAll(tasks, folders);
+        useVaultFilesStore.getState().replaceAll(notes, folders);
     }
 
     private scheduleMetadataUpdate(file: TFile) {
@@ -114,13 +114,13 @@ export class TaskColumnsView extends ItemView {
                 return;
             }
 
-            const task = this.repo.parseTaskByPath(path);
-            if (!task) {
+            const note = this.repo.parseNoteByPath(path);
+            if (!note) {
                 useVaultFilesStore.getState().removeByPath(path);
                 return;
             }
 
-            useVaultFilesStore.getState().upsertTask(task);
+            useVaultFilesStore.getState().upsertNote(note);
         }, METADATA_UPDATE_DEBOUNCE_MS);
         this.metadataUpdateTimers.set(file.path, timer);
     }

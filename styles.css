@@ -1,22 +1,22 @@
 /*
- * Task Columns - カスタムビュー用スタイル
+ * Dated Notes Table - カスタムビュー用スタイル
  *
  * Obsidian プラグイン開発の慣習に従い、以下の方針でスタイリングしています。
  * - 色・フォント・余白などのハードコードを避け、Obsidian が提供する
  *   CSS カスタムプロパティ（--background-primary 等）を使用する。
  * - クラス名は他プラグイン・テーマとの衝突を避けるため、
- *   すべて "task-columns-" プレフィックスを付与する。
+ *   すべて "dated-notes-table-" プレフィックスを付与する。
  * - id セレクタは使用せず、class セレクタのみで構成する。
  */
 
 /* --- レイアウト --- */
 
-.task-columns-view {
-  --task-columns-cell-padding-y: var(--size-4-2, 8px);
-  --task-columns-cell-padding-x: var(--size-4-3, 12px);
-  --task-columns-date-width: 9.5em;
-  --task-columns-category-min-width: 10em;
-  --task-columns-inline-gap: 0.35em;
+.dated-notes-table-view {
+  --dated-notes-table-cell-padding-y: var(--size-4-2, 8px);
+  --dated-notes-table-cell-padding-x: var(--size-4-3, 12px);
+  --dated-notes-table-date-width: 9.5em;
+  --dated-notes-table-folder-min-width: 10em;
+  --dated-notes-table-inline-gap: 0.35em;
 
   display: flex;
   flex-direction: column;
@@ -26,14 +26,14 @@
   color: var(--text-normal);
 }
 
-.task-columns-table-area {
+.dated-notes-table-table-area {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
 }
 
-.task-columns-table-wrapper {
+.dated-notes-table-table-wrapper {
   flex: 1;
   min-height: 0;
   overflow: auto;
@@ -41,7 +41,7 @@
 
 /* --- 日付移動 --- */
 
-.task-columns-date-nav {
+.dated-notes-table-date-nav {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -53,14 +53,14 @@
   background-color: var(--background-secondary);
 }
 
-.task-columns-date-nav-group {
+.dated-notes-table-date-nav-group {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--size-4-1, 4px);
 }
 
-.task-columns-date-nav-button {
+.dated-notes-table-date-nav-button {
   font: inherit;
   font-size: var(--font-ui-small);
   color: var(--text-normal);
@@ -71,23 +71,23 @@
   cursor: pointer;
 }
 
-.task-columns-date-nav-button:hover {
+.dated-notes-table-date-nav-button:hover {
   background-color: var(--background-modifier-hover);
 }
 
-.task-columns-date-nav-date-label {
+.dated-notes-table-date-nav-date-label {
   display: inline-flex;
   align-items: center;
-  gap: var(--task-columns-inline-gap);
+  gap: var(--dated-notes-table-inline-gap);
   font-size: var(--font-ui-small);
   color: var(--text-muted);
 }
 
-.task-columns-date-nav-date-caption {
+.dated-notes-table-date-nav-date-caption {
   white-space: nowrap;
 }
 
-.task-columns-date-nav-date-input {
+.dated-notes-table-date-nav-date-input {
   font: inherit;
   font-size: var(--font-ui-small);
   color: var(--text-normal);
@@ -97,7 +97,7 @@
   padding: 0.25em 0.4em;
 }
 
-.task-columns-table {
+.dated-notes-table-table {
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
@@ -107,28 +107,28 @@
 
 /* --- セル共通 --- */
 
-.task-columns-cell {
+.dated-notes-table-cell {
   vertical-align: top;
-  padding: var(--task-columns-cell-padding-y) var(--task-columns-cell-padding-x);
+  padding: var(--dated-notes-table-cell-padding-y) var(--dated-notes-table-cell-padding-x);
   border-bottom: 1px solid var(--background-modifier-border);
   border-right: 1px solid var(--background-modifier-border);
 }
 
-.task-columns-cell:last-child {
+.dated-notes-table-cell:last-child {
   border-right: none;
 }
 
-.task-columns-cell:hover {
+.dated-notes-table-cell:hover {
   background-color: var(--background-modifier-hover);
 }
 
 /* --- ヘッダ --- */
 
-.task-columns-header-cell {
+.dated-notes-table-header-cell {
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: var(--task-columns-cell-padding-y) var(--task-columns-cell-padding-x);
+  padding: var(--dated-notes-table-cell-padding-y) var(--dated-notes-table-cell-padding-x);
   background-color: var(--background-secondary);
   border-bottom: 1px solid var(--background-modifier-border);
   border-right: 1px solid var(--background-modifier-border);
@@ -138,45 +138,45 @@
   user-select: none;
 }
 
-.task-columns-header-cell:last-child {
+.dated-notes-table-header-cell:last-child {
   border-right: none;
 }
 
-.task-columns-header-inner {
+.dated-notes-table-header-inner {
   display: inline-flex;
   align-items: center;
-  gap: var(--task-columns-inline-gap);
+  gap: var(--dated-notes-table-inline-gap);
 }
 
-.task-columns-header-icon {
+.dated-notes-table-header-icon {
   opacity: 0.75;
 }
 
-.task-columns-header-menu-icon {
+.dated-notes-table-header-menu-icon {
   opacity: 0.5;
   font-size: 0.85em;
   cursor: pointer;
 }
 
-.task-columns-header-menu-icon:hover {
+.dated-notes-table-header-menu-icon:hover {
   opacity: 0.9;
 }
 
-.task-columns-category-header {
-  min-width: var(--task-columns-category-min-width);
+.dated-notes-table-folder-header {
+  min-width: var(--dated-notes-table-folder-min-width);
 }
 
 /* --- データ行 --- */
 
-.task-columns-row-even .task-columns-cell {
+.dated-notes-table-row-even .dated-notes-table-cell {
   background-color: var(--background-primary);
 }
 
-.task-columns-row-odd .task-columns-cell {
+.dated-notes-table-row-odd .dated-notes-table-cell {
   background-color: var(--background-secondary-alt, var(--background-secondary));
 }
 
-.task-columns-row-today .task-columns-cell {
+.dated-notes-table-row-today .dated-notes-table-cell {
   background-color: color-mix(
     in srgb,
     var(--interactive-accent) 14%,
@@ -184,25 +184,25 @@
   );
 }
 
-.task-columns-row-today .task-columns-date-cell {
+.dated-notes-table-row-today .dated-notes-table-date-cell {
   box-shadow: inset 3px 0 0 var(--interactive-accent);
   font-weight: 600;
 }
 
 /* --- 日付列（左端固定） --- */
 
-.task-columns-date-header,
-.task-columns-date-cell {
+.dated-notes-table-date-header,
+.dated-notes-table-date-cell {
   left: 0;
-  width: var(--task-columns-date-width);
-  min-width: var(--task-columns-date-width);
+  width: var(--dated-notes-table-date-width);
+  min-width: var(--dated-notes-table-date-width);
 }
 
-.task-columns-date-header {
+.dated-notes-table-date-header {
   z-index: 3;
 }
 
-.task-columns-date-cell {
+.dated-notes-table-date-cell {
   position: sticky;
   z-index: 1;
   color: var(--text-muted);
@@ -211,46 +211,46 @@
   background-color: inherit;
 }
 
-.task-columns-date-text {
+.dated-notes-table-date-text {
   line-height: 1.3;
 }
 
-.task-columns-holiday-name {
+.dated-notes-table-holiday-name {
   margin-top: 0.15em;
   font-size: 0.85em;
   line-height: 1.2;
   font-weight: 500;
 }
 
-.task-columns-date-saturday {
+.dated-notes-table-date-saturday {
   color: var(--color-blue);
 }
 
-.task-columns-date-sunday-or-holiday {
+.dated-notes-table-date-sunday-or-holiday {
   color: var(--color-red);
 }
 
-/* --- タスク --- */
+/* --- ノート --- */
 
-.task-columns-task {
+.dated-notes-table-note {
   padding: 2px 0;
 }
 
-.task-columns-task+.task-columns-task {
+.dated-notes-table-note+.dated-notes-table-note {
   margin-top: 2px;
 }
 
-.task-columns-task-text {
+.dated-notes-table-note-text {
   cursor: pointer;
 }
 
-.task-columns-task-text:hover {
+.dated-notes-table-note-text:hover {
   text-decoration: underline;
 }
 
 /* --- フッタ（下端固定） --- */
 
-.task-columns-footer-row .task-columns-cell {
+.dated-notes-table-footer-row .dated-notes-table-cell {
   position: sticky;
   bottom: 0;
   z-index: 2;
@@ -258,6 +258,6 @@
   border-top: 1px solid var(--background-modifier-border);
 }
 
-.task-columns-footer-row .task-columns-date-cell {
+.dated-notes-table-footer-row .dated-notes-table-date-cell {
   z-index: 3;
 }

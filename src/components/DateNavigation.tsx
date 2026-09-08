@@ -20,54 +20,54 @@ const DateNavigation = ({ referenceDate, onNavigate }: DateNavigationProps) => {
     };
 
     return (
-        <div className="task-columns-date-nav" role="toolbar" aria-label="日付移動">
-            <div className="task-columns-date-nav-group">
+        <div className="dated-notes-table-date-nav" role="toolbar" aria-label="日付移動">
+            <div className="dated-notes-table-date-nav-group">
                 <button
                     type="button"
-                    className="task-columns-date-nav-button"
+                    className="dated-notes-table-date-nav-button"
                     onClick={() => onNavigate(addMonths(referenceDate, -1))}
                 >
                     1か月戻る
                 </button>
                 <button
                     type="button"
-                    className="task-columns-date-nav-button"
+                    className="dated-notes-table-date-nav-button"
                     onClick={() => onNavigate(addDays(referenceDate, -7))}
                 >
                     1週間戻る
                 </button>
             </div>
 
-            <div className="task-columns-date-nav-group">
+            <div className="dated-notes-table-date-nav-group">
                 <button
                     type="button"
-                    className="task-columns-date-nav-button"
+                    className="dated-notes-table-date-nav-button"
                     onClick={() => onNavigate(startOfDay(new Date()))}
                 >
                     今日
                 </button>
-                <label className="task-columns-date-nav-date-label">
-                    <span className="task-columns-date-nav-date-caption">日付指定</span>
+                <label className="dated-notes-table-date-nav-date-label">
+                    <span className="dated-notes-table-date-nav-date-caption">日付指定</span>
                     <input
                         type="date"
-                        className="task-columns-date-nav-date-input"
+                        className="dated-notes-table-date-nav-date-input"
                         value={dateInputValue}
                         onChange={(event) => handleDateInputChange(event.target.value)}
                     />
                 </label>
             </div>
 
-            <div className="task-columns-date-nav-group">
+            <div className="dated-notes-table-date-nav-group">
                 <button
                     type="button"
-                    className="task-columns-date-nav-button"
+                    className="dated-notes-table-date-nav-button"
                     onClick={() => onNavigate(addDays(referenceDate, 7))}
                 >
                     1週間進む
                 </button>
                 <button
                     type="button"
-                    className="task-columns-date-nav-button"
+                    className="dated-notes-table-date-nav-button"
                     onClick={() => onNavigate(addMonths(referenceDate, 1))}
                 >
                     1か月進む
