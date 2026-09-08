@@ -151,6 +151,8 @@ Follow Obsidian's **Developer Policies** and **Plugin Guidelines**. In particula
 - Provide defaults and validation in settings.
 - Write idempotent code paths so reload/unload doesn't leak listeners or intervals.
 - Use `this.register*` helpers for everything that needs cleanup.
+- When renaming or moving files, use `git mv` so Git history is preserved.
+- After source changes, if documentation (`docs/`, `README`, etc.) is now inconsistent, ask the developer whether the docs should be updated.
 
 **Don't**
 
