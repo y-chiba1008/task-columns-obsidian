@@ -1,23 +1,16 @@
 import TaskModel from '../models/taskModel';
+import { useOpenTask } from '../hooks/useOpenTask';
 import { useVaultFilesStore } from '../stores/vaultFilesStore';
 import { generateCellKey } from '../utils/keyUtils';
-import { openTaskFile } from '../utils/openTaskFile';
 
 const EMPTY_TASKS: TaskModel[] = [];
 
 const TaskCell = ({ date, folder }: { date: Date | null, folder: string }) => {
     const cellKey = generateCellKey(date, folder);
-    const app = useVaultFilesStore((state) => state.app);
+    const openTask = useOpenTask();
     const tasks = useVaultFilesStore(
         (state) => state.fileGroups.get(cellKey) ?? EMPTY_TASKS,
     );
-
-    const handleTitleClick = (task: TaskModel) => {
-        if (!app) {
-            return;
-        }
-        void openTaskFile(app, task.path);
-    };
 
     return (
         <td className="task-columns-cell" key={cellKey}>
@@ -25,7 +18,7 @@ const TaskCell = ({ date, folder }: { date: Date | null, folder: string }) => {
                 <div className="task-columns-task" key={task.taskKey}>
                     <span
                         className="task-columns-task-text"
-                        onClick={() => handleTitleClick(task)}
+                        onClick={() => openTask(task.path)}
                     >
                         {task.title}
                     </span>

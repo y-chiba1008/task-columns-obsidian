@@ -1,16 +1,13 @@
 import { create } from 'zustand';
-import { App } from 'obsidian';
-import TaskColumnsPlugin from '../main';
 import FolderModel from '../models/folderModel';
 import TaskModel from '../models/taskModel';
 import { VaultRepository } from '../repositories/vaultRepository';
 
 interface VaultFilesState {
-    app: App | null;
     fileGroups: Map<string, TaskModel[]>;
     folders: FolderModel[];
-    refresh: (app: App, plugin: TaskColumnsPlugin) => void;
-    update: (path: string, app: App, plugin: TaskColumnsPlugin) => void;
+    refresh: (repo: VaultRepository) => void;
+    update: (path: string, repo: VaultRepository) => void;
 }
 
 function groupTasksByCellKey(tasks: TaskModel[]): Map<string, TaskModel[]> {
@@ -27,18 +24,15 @@ function groupTasksByCellKey(tasks: TaskModel[]): Map<string, TaskModel[]> {
 }
 
 export const useVaultFilesStore = create<VaultFilesState>((set) => ({
-    app: null,
     fileGroups: new Map<string, TaskModel[]>(),
     folders: [],
-    refresh: (app: App, plugin: TaskColumnsPlugin) => {
-        const repo = new VaultRepository(app, plugin.settings);
+    refresh: (repo: VaultRepository) => {
         const fileGroups = groupTasksByCellKey(repo.listTasks());
         const folders = repo.listFolders();
-        set({ app, fileGroups, folders });
+        set({ fileGroups, folders });
     },
 
-    update: (path: string, app: App, plugin: TaskColumnsPlugin) => {
-        const repo = new VaultRepository(app, plugin.settings);
+    update: (path: string, repo: VaultRepository) => {
         if (!repo.isUnderTargetFolder(path)) {
             return;
         }

@@ -7,7 +7,7 @@ import { isUnderExcludedPath, parseExcludedFolders } from '../utils/pathUtils';
 export class VaultRepository {
     constructor(
         private readonly app: App,
-        private readonly settings: TaskColumnsSettings,
+        private readonly getSettings: () => TaskColumnsSettings,
     ) {}
 
     listTasks(): TaskModel[] {
@@ -35,7 +35,7 @@ export class VaultRepository {
     }
 
     isUnderTargetFolder(path: string): boolean {
-        return path.startsWith(this.settings.targetFolder + '/');
+        return path.startsWith(this.getSettings().targetFolder + '/');
     }
 
     isExcluded(path: string): boolean {
@@ -60,7 +60,7 @@ export class VaultRepository {
     }
 
     private getExcludedFolders(): string[] {
-        return parseExcludedFolders(this.settings.excludedFolders);
+        return parseExcludedFolders(this.getSettings().excludedFolders);
     }
 
     // Future: createTask, updateTask, deleteTask, etc.
