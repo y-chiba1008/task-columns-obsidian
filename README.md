@@ -46,9 +46,9 @@ datetime: 2026-08-22T10:00:00
 ## 開発
 
 ```bash
-npm install
-npm run dev    # ウォッチビルド
-npm run build  # 本番ビルド
+pnpm install
+pnpm run dev    # ウォッチビルド
+pnpm run build  # 本番ビルド
 ```
 
 成果物 `main.js` / `manifest.json` / `styles.css` を Vault の `.obsidian/plugins/dated-notes-table/` に配置して利用します。
